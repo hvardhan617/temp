@@ -4,11 +4,6 @@ import Navbar from "@/components/Layout/Navbar";
 import ImageSlider from "@/components/MicroUI/ImageSlider";
 import ProductInfo from "@/components/ProductInfo";
 import { ProductContext } from "@/context/ProductContext";
-import {
-  getBrandData,
-  getCampaignData,
-  getProductsData,
-} from "@/helper/apiHelper";
 import { initEventApps } from "@/helper/EventTracker";
 import { getDataLayer } from "@/helper/globalDataLayer";
 import { isInViewport } from "@/helper/utilityHelper";
@@ -17,7 +12,7 @@ import { useRouter } from "next/router";
 import Script from "next/script";
 import React, { useContext, useEffect, useState } from "react";
 
-const Prod = ({ productData, campaignData, brandData }) => {
+const Collection = ({ productData, campaignData, brandData }) => {
   const router = useRouter();
   const { id } = router.query;
   const { globalState, setGlobalState } = useContext(ProductContext);
@@ -53,8 +48,6 @@ const Prod = ({ productData, campaignData, brandData }) => {
       <div className="flex flex-row items-center justify-between w-full h-16 py-3 lg:justify-center lg:gap-16">
         <Navbar brandData={brandData} />
       </div>
-      <Pixel />
-      <GA/>
       <div className="flex justify-center w-full ">
         <div className="flex flex-col lg:items-start lg:justify-between lg:flex-row lg:w-[90vw] lg:max-w-[1800px]">
           <div className="lg:w-[32vw] lg:max-w-[768px] xl:w-[36vw] xl:max-w-[768px]">
@@ -87,7 +80,7 @@ const Prod = ({ productData, campaignData, brandData }) => {
   );
 };
 
-export default Prod;
+export default Collection;
 
 export async function getServerSideProps({ query }) {
   try {
@@ -115,48 +108,43 @@ export async function getServerSideProps({ query }) {
   }
 }
 
-const Pixel = () => {
-  useEffect(() => {
-    !(function (f, b, e, v, n, t, s) {
-      if (f.fbq) return;
-      n = f.fbq = function () {
-        n.callMethod
-          ? n.callMethod.apply(n, arguments)
-          : n.queue.push(arguments);
-      };
-      if (!f._fbq) f._fbq = n;
-      n.push = n;
-      n.loaded = !0;
-      n.version = "2.0";
-      n.queue = [];
-      t = b.createElement(e);
-      t.async = !0;
-      t.src = v;
-      s = b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t, s);
-    })(
-      window,
-      document,
-      "script",
-      "https://connect.facebook.net/en_US/fbevents.js"
-    );
-    fbq("init", "590918032795677");
-    fbq("track", "PageView");
-  }, []);
+async function getProductsData(id) {
+  // let dev = 'https://myapi.fibr.shop/';
+  let staging = "https://staging-api.fibr.shop/product";
+  let res = await fetch(`${staging}/pdp/products/${id}`, {
+    method: "GET",
+  });
+  let data = await res.json();
+  return data;
+}
 
-  return null;
-};
+async function getBrandData(id) {
+  // let dev = 'https://brands-api.fibr.shop/';
+  let staging = "https://staging-api.fibr.shop/brand";
+  let res = await fetch(`${staging}/pdp/brand/${id}`, {
+    method: "GET",
+  });
+  let data = await res.json();
+  return data;
+}
 
-const GA = () => {
-  useEffect(() => {
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag("js", new Date());
+async function getCollectionData(id) {
+  let staging = "https://staging-api.fibr.shop/product";
 
-    gtag("config", "G-YZ3X85LCKZ");
-  }, []);
+  let res = await fetch(`${staging}/pdp/product-groups/${id}`, {
+    method: "GET",
+  });
+  let data = await res.json();
+  return data;
+}
 
-  return null;
-};
+async function getCampaignData(id) {
+  // let dev = 'https://dev-brands.fibr.shop';
+  let staging = "https://staging-api.fibr.shop/brand";
+
+  let res = await fetch(`${staging}/pdp/campaign/${id}`, {
+    method: "GET",
+  });
+  let data = await res.json();
+  return data;
+}
