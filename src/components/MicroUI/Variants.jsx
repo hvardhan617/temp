@@ -47,6 +47,9 @@ const Variants = () => {
 
     const selectedVariant = getMatchedVariant(variants, optionObj);
 
+    if (!selectedVariant) {
+      return;
+    }
     let search = window.location.search;
 
     search = search.split("?")[1];
@@ -373,7 +376,6 @@ const VariantV2 = ({ data, selectedOption, handleOption, id }) => {
               return (
                 <button
                   key={i}
-                  disabled={!value.enable}
                   style={
                     selectedOption[data.key].label === value.label
                       ? {

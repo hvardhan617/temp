@@ -131,7 +131,7 @@ const ShippingCard = ({ shipping, shippingIncluded }) => {
     <div className="flex items-center justify-between gap-3 lg:gap-9">
       <div className="bg-blue-50 lg:bg-white bg-opacity-60 flex items-center p-2 rounded-md border-dashed border-[1px] border-[#9FD5ECE5] h-14 lg:h-8">
         <div className="pr-2 border-dashed border-r-[1px] border-blue-200">
-          <img src={Box} className="w-6 h-6" />
+          <img src={Box.src} className="w-6 h-6" />
         </div>
         <div className="items-center gap-6 pl-4 lg:flex">
           <p className="text-[10px] font-semibold text-[#2193C2E5]">

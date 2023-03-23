@@ -165,7 +165,7 @@ export const getDataLayer = (server) => {
   if (!server) {
     return;
   }
-  if (false) {
+  if (server.multi) {
     data = {
       brand: {
         logo: "https://cdn.shopify.com/s/files/1/0057/8938/4802/files/boat_logo_small.webp?v=1672379935",
@@ -196,10 +196,13 @@ export const getDataLayer = (server) => {
             details: [...server.data.products[0].variants],
           },
         ],
+
+        options: cleanOptions(server.data.products[0].options),
       },
       selectedVariant: { ...server.data.products[0].variants[0] },
       productList: getProductDetailsObj(server.data.products),
       stores: server.data.stores,
+      collectionName: server.data.name,
     };
   } else {
     data = {
@@ -262,12 +265,13 @@ export const getDataLayer = (server) => {
     variants: { ...data.details.variants[0] },
     productDetails: data.details,
     brandData: server.brandData,
+    collectionName: data.collectionName,
     variantDetails: data.details.variants,
     finalCart: {},
   };
 };
 
-const getProductDetailsObj = () => {
+const getProductDetailsObj = (data) => {
   let products = data.map((prod) => {
     return {
       ...prod,
@@ -288,12 +292,13 @@ const getProductDetailsObj = () => {
 export const getProductDetails = (globalState, prod) => {
   return {
     ...globalState,
-    selectedProduct: prod,
+    selectedProduct: { ...prod, options: cleanOptions(prod.options) },
     storesData: { ...prod.variants[0].details[0].storesPrices },
     selectedVariant: { ...prod.variants[0].details[0] },
     variants: { ...prod.variants[0] },
     productDetails: {
       ...prod,
+      options: cleanOptions(prod.options),
     },
 
     cartItems: [

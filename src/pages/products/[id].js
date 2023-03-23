@@ -48,6 +48,7 @@ const Prod = ({ productData, campaignData, brandData }) => {
     isInViewport(box) ? setHideBottom(true) : setHideBottom(false);
   };
 
+
   return (
     <div className="relative">
       <div className="flex flex-row items-center justify-between w-full h-16 py-3 lg:justify-center lg:gap-16">
