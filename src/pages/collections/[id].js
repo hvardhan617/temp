@@ -7,9 +7,7 @@ import { ProductContext } from "@/context/ProductContext";
 import { initEventApps } from "@/helper/EventTracker";
 import { getDataLayer } from "@/helper/globalDataLayer";
 import { isInViewport } from "@/helper/utilityHelper";
-import Head from "next/head";
 import { useRouter } from "next/router";
-import Script from "next/script";
 import React, { useContext, useEffect, useState } from "react";
 
 const Collection = ({ productData, campaignData, brandData }) => {
