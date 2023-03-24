@@ -444,8 +444,7 @@ const VariantV2 = ({ data, selectedOption, handleOption, id }) => {
 
 VariantV2.propTypes = {
   data: PropTypes.object,
-  selectedOption: PropTypes.func,
+  selectedOption: PropTypes.object,
   handleOption: PropTypes.func,
-  key: PropTypes.number,
   id: PropTypes.number,
 };

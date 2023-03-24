@@ -10,7 +10,7 @@ import {
   getProductsData,
 } from "@/helper/apiHelper";
 import { initEventApps } from "@/helper/EventTracker";
-import { getDataLayer } from "@/helper/globalDataLayer";
+import { getDataLayer, persistCart } from "@/helper/globalDataLayer";
 import { isInViewport } from "@/helper/utilityHelper";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -41,6 +41,8 @@ const Prod = ({ productData, campaignData, brandData }) => {
     document.addEventListener("scroll", toggleBottomBar, {
       passive: true,
     });
+
+    persistCart(state.cartItems);
   }, []);
 
   const toggleBottomBar = () => {
@@ -48,14 +50,13 @@ const Prod = ({ productData, campaignData, brandData }) => {
     isInViewport(box) ? setHideBottom(true) : setHideBottom(false);
   };
 
-
   return (
     <div className="relative">
       <div className="flex flex-row items-center justify-between w-full h-16 py-3 lg:justify-center lg:gap-16">
         <Navbar brandData={brandData} />
       </div>
       <Pixel />
-      <GA/>
+      <GA />
       <div className="flex justify-center w-full ">
         <div className="flex flex-col lg:items-start lg:justify-between lg:flex-row lg:w-[90vw] lg:max-w-[1800px]">
           <div className="lg:w-[32vw] lg:max-w-[768px] xl:w-[36vw] xl:max-w-[768px]">

@@ -38,3 +38,16 @@ export async function getCampaignData(id) {
   let data = await res.json();
   return data;
 }
+
+export async function getCartDetails(id) {
+  // let dev = 'https://dev-brands.fibr.shop';
+  let staging = "https://staging-api.fibr.shop/product";
+
+  let res = await fetch(`${staging}/pdp/cart/create/${id}`, {
+    method: "PUT",
+  });
+  let data = await res.json();
+  return data;
+}
+
+

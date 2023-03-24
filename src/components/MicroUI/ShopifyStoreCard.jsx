@@ -148,5 +148,5 @@ const ShippingCard = ({ shipping, shippingIncluded }) => {
 
 ShippingCard.propTypes = {
   shipping: PropTypes.object,
-  shippingIncluded: PropTypes.object,
+  shippingIncluded: PropTypes.bool,
 };

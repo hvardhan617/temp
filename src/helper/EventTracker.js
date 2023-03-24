@@ -6,6 +6,7 @@ import ReactGA from "react-ga";
 
 const sendMixPanelEvent = (eventName, extras) => {
   mixpanel.track(eventName, extras);
+  console.log('mixpanel.get_distinct_id()', mixpanel.get_distinct_id(),);
 };
 
 export const initEventApps = () => {

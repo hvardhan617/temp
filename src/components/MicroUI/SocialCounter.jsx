@@ -13,12 +13,12 @@ const SocialCounter = ({ social }) => {
     }, 3000);
   }, []);
   return (
-    <div className="h-7 overflow-scroll scroll-smooth" id="socialScroll">
+    <div className="overflow-scroll h-7 scroll-smooth" id="socialScroll">
       {Object.keys(social).map((s, i) => {
         if (social[s].followerCount === '') return null;
         return (
           <div
-            className="flex justify-end gap-2 items-center text-slate-600 text-xs h-7"
+            className="flex items-center justify-end gap-2 text-xs text-slate-600 h-7"
             key={i}
             onClick={() => sendEvent('Click_Socials')}
             id={`social-${i}`}
@@ -35,7 +35,7 @@ const SocialCounter = ({ social }) => {
 };
 
 SocialCounter.propTypes = {
-  social: PropTypes.array,
+  social: PropTypes.object,
 };
 
 export default SocialCounter;

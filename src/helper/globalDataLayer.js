@@ -248,7 +248,7 @@ export const getDataLayer = (server) => {
     currency: getCurrency("USD"),
     theme: { ...data.brand.theme },
     productAddedToCart: false,
-    cartItems: [
+    cartItems: getCart() ?? [
       {
         ...data.details.variants[0].details[0],
         quantity: 1,
@@ -332,4 +332,20 @@ const cleanOptions = (options) => {
   console.log("cleanOptions", newOptions);
 
   return newOptions;
+};
+
+export const persistCart = (cart) => {
+  sessionStorage.setItem("cart", JSON.stringify(cart));
+};
+
+export const getCart = () => {
+  try {
+    let cart = sessionStorage.getItem("cart");
+    if (cart) {
+      return JSON.parse(cart);
+    }
+    return undefined;
+  } catch (error) {
+    return [];
+  }
 };
