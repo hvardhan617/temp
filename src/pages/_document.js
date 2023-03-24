@@ -7,6 +7,7 @@ export default function Document() {
       <body>
         <Main />
         <NextScript />
+        <iframe sandbox="allow-same-origin"></iframe>
       </body>
     </Html>
   )
