@@ -1,3 +1,4 @@
+import { getCartDetails } from "@/helper/apiHelper";
 import PropTypes from "prop-types";
 import { useContext, useEffect, useState } from "react";
 import { ProductContext } from "../../context/ProductContext";
@@ -12,22 +13,23 @@ const Variants = () => {
   const [variantOptions, setVariantOption] = useState([...tempVariantsOptions]);
 
   useEffect(() => {
-    console.log('variantusss', globalState.productDetails);
+    console.log("variantusss", globalState.productDetails);
     let optionObj = {};
-    variantOptions.map((option) => {
-      optionObj = {
-        ...optionObj,
-        [option.key]: option.values[0],
-      };
+
+    let x = { ...globalState.selectedVariant.options };
+
+    Object.keys(x).map((k) => {
+      if (!x[k].label) {
+        x[k] = {
+          label: x[k],
+          enable: true,
+        };
+      }
     });
 
-    setSelectedOption(optionObj);
-    const matchedVariant = getMatchedVariant(variants, optionObj);
+    console.log("xxxx", x);
 
-    setGlobalState({
-      ...globalState,
-      selectedVariant: matchedVariant,
-    });
+    setSelectedOption(x);
   }, []);
 
   const handleOption = (key, value) => {
@@ -46,6 +48,10 @@ const Variants = () => {
 
     const selectedVariant = getMatchedVariant(variants, optionObj);
 
+    getCartDetails('641d875ba520e006c7098e61')
+    if (!selectedVariant) {
+      return;
+    }
     let search = window.location.search;
 
     search = search.split("?")[1];
@@ -94,8 +100,6 @@ const Variants = () => {
   };
 
   const getMatchedVariant = (variants, optionObj) => {
-
-
     let mVairant = variants.filter((variant) => {
       let variantOptions = variant.options;
       let matchedVariant = true;
@@ -374,9 +378,8 @@ const VariantV2 = ({ data, selectedOption, handleOption, id }) => {
               return (
                 <button
                   key={i}
-                  disabled={!value.enable}
                   style={
-                    selectedOption[data.key] === value
+                    selectedOption[data.key].label === value.label
                       ? {
                           backgroundColor: theme.solid,
                           borderColor: "white",
@@ -409,7 +412,7 @@ const VariantV2 = ({ data, selectedOption, handleOption, id }) => {
                   key={i}
                   disabled={!value.enable}
                   style={
-                    selectedOption[data.key] === value
+                    selectedOption[data.key].label === value.label
                       ? {
                           backgroundColor: theme.solid,
                           borderColor: "white",
@@ -443,8 +446,7 @@ const VariantV2 = ({ data, selectedOption, handleOption, id }) => {
 
 VariantV2.propTypes = {
   data: PropTypes.object,
-  selectedOption: PropTypes.func,
+  selectedOption: PropTypes.object,
   handleOption: PropTypes.func,
-  key: PropTypes.number,
   id: PropTypes.number,
 };

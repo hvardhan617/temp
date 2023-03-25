@@ -15,7 +15,6 @@ const ProductInfo = ({ details }) => {
 
   if (globalState) {
     const productDetails = globalState.productDetails;
-    console.log("productDetails", globalState);
     const shopifyPrice = globalState.selectedVariant.pricesFromStores.filter(
       (store) => store.storeId === "shopify"
     )[0];

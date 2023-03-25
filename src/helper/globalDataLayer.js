@@ -165,7 +165,7 @@ export const getDataLayer = (server) => {
   if (!server) {
     return;
   }
-  if (false) {
+  if (server.multi) {
     data = {
       brand: {
         logo: "https://cdn.shopify.com/s/files/1/0057/8938/4802/files/boat_logo_small.webp?v=1672379935",
@@ -196,10 +196,13 @@ export const getDataLayer = (server) => {
             details: [...server.data.products[0].variants],
           },
         ],
+
+        options: cleanOptions(server.data.products[0].options),
       },
       selectedVariant: { ...server.data.products[0].variants[0] },
       productList: getProductDetailsObj(server.data.products),
       stores: server.data.stores,
+      collectionName: server.data.name,
     };
   } else {
     data = {
@@ -245,15 +248,25 @@ export const getDataLayer = (server) => {
     currency: getCurrency("USD"),
     theme: { ...data.brand.theme },
     productAddedToCart: false,
-    cartItems: [
-      {
-        ...data.details.variants[0].details[0],
-        quantity: 1,
-        thumbnail:
-          "https://ik.manmatters.com/media/misc/pdp_rcl/26166797/4_-Redensyl-Oil-_600X600_-with-ingredients_xs66fiKuT.png?tr=w-600",
-      },
-    ],
-    multiProductCart: [],
+    cartItems: server.multi
+      ? [
+          {
+            ...data.details.variants[0].details[0],
+            quantity: 1,
+            thumbnail:
+              "https://ik.manmatters.com/media/misc/pdp_rcl/26166797/4_-Redensyl-Oil-_600X600_-with-ingredients_xs66fiKuT.png?tr=w-600",
+          },
+        ]
+      : getCart() ?? [
+          {
+            ...data.details.variants[0].details[0],
+            quantity: 1,
+            thumbnail:
+              "https://ik.manmatters.com/media/misc/pdp_rcl/26166797/4_-Redensyl-Oil-_600X600_-with-ingredients_xs66fiKuT.png?tr=w-600",
+          },
+        ],
+
+    multiProductCart: server.multi ? getCart() ?? [] : [],
     productList: data.productList ? [...data.productList] : undefined,
     selectedStore: "Shopify",
     stores: data.stores,
@@ -262,12 +275,13 @@ export const getDataLayer = (server) => {
     variants: { ...data.details.variants[0] },
     productDetails: data.details,
     brandData: server.brandData,
+    collectionName: data.collectionName,
     variantDetails: data.details.variants,
     finalCart: {},
   };
 };
 
-const getProductDetailsObj = () => {
+const getProductDetailsObj = (data) => {
   let products = data.map((prod) => {
     return {
       ...prod,
@@ -288,12 +302,13 @@ const getProductDetailsObj = () => {
 export const getProductDetails = (globalState, prod) => {
   return {
     ...globalState,
-    selectedProduct: prod,
+    selectedProduct: { ...prod, options: cleanOptions(prod.options) },
     storesData: { ...prod.variants[0].details[0].storesPrices },
     selectedVariant: { ...prod.variants[0].details[0] },
     variants: { ...prod.variants[0] },
     productDetails: {
       ...prod,
+      options: cleanOptions(prod.options),
     },
 
     cartItems: [
@@ -327,4 +342,20 @@ const cleanOptions = (options) => {
   console.log("cleanOptions", newOptions);
 
   return newOptions;
+};
+
+export const persistCart = (cart) => {
+  sessionStorage.setItem("cart", JSON.stringify(cart));
+};
+
+export const getCart = () => {
+  try {
+    let cart = sessionStorage.getItem("cart");
+    if (cart) {
+      return JSON.parse(cart);
+    }
+    return undefined;
+  } catch (error) {
+    return [];
+  }
 };

@@ -4,10 +4,17 @@ import Navbar from "@/components/Layout/Navbar";
 import ImageSlider from "@/components/MicroUI/ImageSlider";
 import ProductInfo from "@/components/ProductInfo";
 import { ProductContext } from "@/context/ProductContext";
+import {
+  getBrandData,
+  getCampaignData,
+  getProductsData,
+} from "@/helper/apiHelper";
 import { initEventApps } from "@/helper/EventTracker";
-import { getDataLayer } from "@/helper/globalDataLayer";
+import { getDataLayer, persistCart } from "@/helper/globalDataLayer";
 import { isInViewport } from "@/helper/utilityHelper";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import Script from "next/script";
 import React, { useContext, useEffect, useState } from "react";
 
 const Prod = ({ productData, campaignData, brandData }) => {
@@ -23,7 +30,9 @@ const Prod = ({ productData, campaignData, brandData }) => {
     console.log("globaleState", state);
     setExtraContent(true);
     setGlobalState({ ...state });
-    initEventApps();
+    if (typeof window !== undefined) {
+      initEventApps();
+    }
 
     setTimeout(() => {
       toggleBottomBar();
@@ -32,6 +41,8 @@ const Prod = ({ productData, campaignData, brandData }) => {
     document.addEventListener("scroll", toggleBottomBar, {
       passive: true,
     });
+
+    persistCart(state.cartItems);
   }, []);
 
   const toggleBottomBar = () => {
@@ -44,6 +55,8 @@ const Prod = ({ productData, campaignData, brandData }) => {
       <div className="flex flex-row items-center justify-between w-full h-16 py-3 lg:justify-center lg:gap-16">
         <Navbar brandData={brandData} />
       </div>
+      <Pixel />
+      <GA />
       <div className="flex justify-center w-full ">
         <div className="flex flex-col lg:items-start lg:justify-between lg:flex-row lg:w-[90vw] lg:max-w-[1800px]">
           <div className="lg:w-[32vw] lg:max-w-[768px] xl:w-[36vw] xl:max-w-[768px]">
@@ -81,13 +94,19 @@ export default Prod;
 export async function getServerSideProps({ query }) {
   try {
     console.log("query1122", JSON.stringify(query));
-
     const productData = await getProductsData(query.id);
     console.log("productData", productData);
     const campaignData = await getCampaignData(query.campaign);
     console.log("campaignData", campaignData);
     const brandData = await getBrandData(campaignData.data.id.brandId);
     console.log("branddata", brandData);
+    let allData = JSON.stringify();
+
+    let stringifyP = JSON.stringify(productData);
+    let stringifyC = JSON.stringify(campaignData);
+    let stringifyB = JSON.stringify(brandData);
+
+    console.log("stringified", stringifyB, stringifyC, stringifyP);
     return {
       props: {
         productData: productData.data,
@@ -104,43 +123,48 @@ export async function getServerSideProps({ query }) {
   }
 }
 
-async function getProductsData(id) {
-  // let dev = 'https://myapi.fibr.shop/';
-  let staging = "https://staging-api.fibr.shop/product";
-  let res = await fetch(`${staging}/pdp/products/${id}`, {
-    method: "GET",
-  });
-  let data = await res.json();
-  return data;
-}
+const Pixel = () => {
+  useEffect(() => {
+    !(function (f, b, e, v, n, t, s) {
+      if (f.fbq) return;
+      n = f.fbq = function () {
+        n.callMethod
+          ? n.callMethod.apply(n, arguments)
+          : n.queue.push(arguments);
+      };
+      if (!f._fbq) f._fbq = n;
+      n.push = n;
+      n.loaded = !0;
+      n.version = "2.0";
+      n.queue = [];
+      t = b.createElement(e);
+      t.async = !0;
+      t.src = v;
+      s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s);
+    })(
+      window,
+      document,
+      "script",
+      "https://connect.facebook.net/en_US/fbevents.js"
+    );
+    fbq("init", "590918032795677");
+    fbq("track", "PageView");
+  }, []);
 
-async function getBrandData(id) {
-  // let dev = 'https://brands-api.fibr.shop/';
-  let staging = "https://staging-api.fibr.shop/brand";
-  let res = await fetch(`${staging}/pdp/brand/${id}`, {
-    method: "GET",
-  });
-  let data = await res.json();
-  return data;
-}
+  return null;
+};
 
-async function getCollectionData(id) {
-  let staging = "https://staging-api.fibr.shop/product";
+const GA = () => {
+  useEffect(() => {
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
 
-  let res = await fetch(`${staging}/pdp/product-groups/${id}`, {
-    method: "GET",
-  });
-  let data = await res.json();
-  return data;
-}
+    gtag("config", "G-YZ3X85LCKZ");
+  }, []);
 
-async function getCampaignData(id) {
-  // let dev = 'https://dev-brands.fibr.shop';
-  let staging = "https://staging-api.fibr.shop/brand";
-
-  let res = await fetch(`${staging}/pdp/campaign/${id}`, {
-    method: "GET",
-  });
-  let data = await res.json();
-  return data;
-}
+  return null;
+};

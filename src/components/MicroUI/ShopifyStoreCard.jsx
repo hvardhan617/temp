@@ -3,7 +3,7 @@ import { ProductContext } from '../../context/ProductContext';
 import Tag from './CheckoutComponents/Tag';
 import { calculateFinalCart, getTotal } from '../../helper/QuantityHelper';
 import RightArrowIcon from '../Icons/RightArrowIcon';
-import Box from '/src/components/Icons/Box.svg';
+import Box from '@/components/Icons/Box.svg';
 import { sendEvent } from '../../helper/EventTracker';
 import PropTypes from 'prop-types';
 
@@ -24,24 +24,24 @@ const ShopifyStoreCard = () => {
 
   return (
     <div className="w-full border-y-[1px] border-zinc-100 flex flex-col justify-between gap-1 pb-4">
-      <div className="flex gap-4 justify-between">
+      <div className="flex justify-between gap-4">
         <Tag title="BEST DEAL" />
         <div className="lg:hidden">
           <CouponCard />
         </div>
       </div>
-      <div className="flex justify-between items-center lg:items-end">
-        <div className="flex flex-col gap-2 justify-start">
-          <div className="flex gap-2 items-center">
-            <img src={brandData.logo.url} className="w-20 h-16 object-contain" />
+      <div className="flex items-center justify-between lg:items-end">
+        <div className="flex flex-col justify-start gap-2">
+          <div className="flex items-center gap-2">
+            <img src={brandData.logo.url} className="object-contain w-20 h-16" />
           </div>
         </div>
 
-        <div className="flex flex-col justify-center items-center gap-2">
+        <div className="flex flex-col items-center justify-center gap-2">
           <div className="hidden lg:flex">
             <CouponCard1 />
           </div>
-          <div className="flex justify-end items-center gap-3 storeCard">
+          <div className="flex items-center justify-end gap-3 storeCard">
             <div className="flex flex-col items-end">
               <p className="text-[14px] font-semibold text-red-500">
                 {calculateFinalCart(store, getTotal(globalState.cartItems, store)).msg}
@@ -58,7 +58,7 @@ const ShopifyStoreCard = () => {
           </div>
         </div>
         <button
-          className="hidden bg-black text-white rounded-md font-semibold lg:flex justify-center items-center gap-3 w-32 h-14 disabled:bg-zinc-500"
+          className="items-center justify-center hidden w-32 gap-3 font-semibold text-white bg-black rounded-md lg:flex h-14 disabled:bg-zinc-500"
           id="checkOut1"
           disabled={OutofStock}
           style={{
@@ -75,10 +75,10 @@ const ShopifyStoreCard = () => {
         </button>
       </div>
 
-      <div className="flex justify-between items-center gap-3 lg:gap-9 lg:mt-3 w-full">
+      <div className="flex items-center justify-between w-full gap-3 lg:gap-9 lg:mt-3">
         <ShippingCard shipping={brandData.shipping} shippingIncluded={store.shippingIncluded} />
         <button
-          className="lg:hidden bg-black text-white rounded-md font-semibold flex justify-center items-center gap-3 w-32 h-14"
+          className="flex items-center justify-center w-32 gap-3 font-semibold text-white bg-black rounded-md lg:hidden h-14"
           id="checkOut2"
           disabled={OutofStock}
           style={{
@@ -128,12 +128,12 @@ export default ShopifyStoreCard;
 
 const ShippingCard = ({ shipping, shippingIncluded }) => {
   return (
-    <div className="flex justify-between items-center gap-3 lg:gap-9">
+    <div className="flex items-center justify-between gap-3 lg:gap-9">
       <div className="bg-blue-50 lg:bg-white bg-opacity-60 flex items-center p-2 rounded-md border-dashed border-[1px] border-[#9FD5ECE5] h-14 lg:h-8">
         <div className="pr-2 border-dashed border-r-[1px] border-blue-200">
-          <img src={Box} className="w-6 h-6" />
+          <img src={Box.src} className="w-6 h-6" />
         </div>
-        <div className="pl-4 lg:flex items-center gap-6">
+        <div className="items-center gap-6 pl-4 lg:flex">
           <p className="text-[10px] font-semibold text-[#2193C2E5]">
             Delivery in {shipping.minDelivery}-{shipping.maxDelivery} days
           </p>
@@ -148,5 +148,5 @@ const ShippingCard = ({ shipping, shippingIncluded }) => {
 
 ShippingCard.propTypes = {
   shipping: PropTypes.object,
-  shippingIncluded: PropTypes.object,
+  shippingIncluded: PropTypes.bool,
 };
