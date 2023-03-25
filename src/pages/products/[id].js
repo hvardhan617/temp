@@ -94,13 +94,19 @@ export default Prod;
 export async function getServerSideProps({ query }) {
   try {
     console.log("query1122", JSON.stringify(query));
-
     const productData = await getProductsData(query.id);
     console.log("productData", productData);
     const campaignData = await getCampaignData(query.campaign);
     console.log("campaignData", campaignData);
     const brandData = await getBrandData(campaignData.data.id.brandId);
     console.log("branddata", brandData);
+    let allData = JSON.stringify();
+
+    let stringifyP = JSON.stringify(productData);
+    let stringifyC = JSON.stringify(campaignData);
+    let stringifyB = JSON.stringify(brandData);
+
+    console.log("stringified", stringifyB, stringifyC, stringifyP);
     return {
       props: {
         productData: productData.data,

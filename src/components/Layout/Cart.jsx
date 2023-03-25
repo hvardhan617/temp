@@ -89,9 +89,9 @@ function Cart({ setOpenCart }) {
         <div className="rounded-t-2xl py-4 flex flex-col gap-3 border-b-[1px] border-zinc-100">
           <div className="flex justify-between items-center px-4 text-[14px]">
             <p>Cart Summary</p>
-            <img className="" src={cross} onClick={() => handleCart(false)} />
+            <img className="" src={cross.src} onClick={() => handleCart(false)} />
           </div>
-          <div className="flex gap-2 px-4 items-center ">
+          <div className="flex items-center gap-2 px-4 ">
             {calculateTotalItems(
               globalState.multiProductCart.length > 0
                 ? globalState.multiProductCart
@@ -114,8 +114,8 @@ function Cart({ setOpenCart }) {
             })}
           </div>
           <div className="flex p-4 px-6 items-center gap-8 border-b-[1px] border-zinc-100">
-            <img src={truck} />
-            <p className="text-xs text-zinc-400 font-light">
+            <img src={truck.src} />
+            <p className="text-xs font-light text-zinc-400">
               Usually delivered in 2-3 Business days
             </p>
           </div>
@@ -126,32 +126,32 @@ function Cart({ setOpenCart }) {
             </div>
 
             <div className="py-6 border-b-[1px] border-zinc-100">
-              <div className="flex justify-between text-xs items-center">
-                <p className="text-zinc-400 font-light">Item total</p>
-                <p className="text-zinc-400 font-medium">
+              <div className="flex items-center justify-between text-xs">
+                <p className="font-light text-zinc-400">Item total</p>
+                <p className="font-medium text-zinc-400">
                   {globalState.currency} {parseFloat(priceDetails.totalCostPrice)}
                 </p>
               </div>
               {store && (
-                <div className="flex justify-between text-xs items-center">
-                  <p className="text-zinc-400 font-light">
+                <div className="flex items-center justify-between text-xs">
+                  <p className="font-light text-zinc-400">
                     Discount Applied{' '}
                     <span className="font-semibold">{store.couponApplied.code}</span>
                   </p>
-                  <p className="text-zinc-400 font-medium">
+                  <p className="font-medium text-zinc-400">
                     - {globalState.currency} {parseFloat(priceDetails.totalSavings).toFixed()}
                   </p>
                 </div>
               )}
-              <div className="flex justify-between text-xs items-center">
-                <p className="text-zinc-400 font-light">Shipping charges</p>
-                <p className="text-zinc-400 font-medium">Extra</p>
+              <div className="flex items-center justify-between text-xs">
+                <p className="font-light text-zinc-400">Shipping charges</p>
+                <p className="font-medium text-zinc-400">Extra</p>
               </div>
             </div>
             <div className="py-2">
-              <div className="flex justify-between text-xs items-center">
-                <p className="text-zinc-700 font-light">Bill Total</p>
-                <p className="text-zinc-800 font-medium">
+              <div className="flex items-center justify-between text-xs">
+                <p className="font-light text-zinc-700">Bill Total</p>
+                <p className="font-medium text-zinc-800">
                   {globalState.currency} {parseFloat(priceDetails.finalPrice).toFixed()}
                 </p>
               </div>

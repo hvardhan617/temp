@@ -1,3 +1,4 @@
+import { getCartDetails } from "@/helper/apiHelper";
 import PropTypes from "prop-types";
 import { useContext, useEffect, useState } from "react";
 import { ProductContext } from "../../context/ProductContext";
@@ -47,6 +48,7 @@ const Variants = () => {
 
     const selectedVariant = getMatchedVariant(variants, optionObj);
 
+    getCartDetails('641d875ba520e006c7098e61')
     if (!selectedVariant) {
       return;
     }

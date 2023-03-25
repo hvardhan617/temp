@@ -33,20 +33,7 @@ const Description = ({ productDetails }) => {
           return <img src={imgSrc} key={i} className="rounded-md" />;
         })}
       </div>
-      <div className="mt-4">
-        {productDetails.parsedDetails.map((tags) => {
-          console.log("tagss", tags);
-          if (tags.type === "p") {
-            return tags.text.map((textString) => {
-              return <p className="my-2 text-sm">{textString}</p>;
-            });
-          } else {
-            return tags.text.map((textString) => {
-              return <h1 className="my-4 text-3xl">{textString}</h1>;
-            });
-          }
-        })}
-      </div>
+      
       <div className="mt-4">
         {hideContent ? (
           <>
@@ -80,13 +67,17 @@ const Description = ({ productDetails }) => {
           </>
         ) : (
           <>
-            {productDetails.parsedDetails.map((tags, i) => {
+            {productDetails.parsedDetails.map((tags) => {
               if (tags.type === "p") {
-                return tags.text.map((textString) => {
+                return tags?.text.map((textString) => {
                   return <p className="my-2 text-sm">{textString}</p>;
                 });
+              } else if (tags.type === "table") {
+                return null;
               } else {
-                return tags.text.map((textString) => {
+                console.log("tags.text", tags.text);
+
+                return tags?.text.map((textString) => {
                   return <h1 className="my-4 text-3xl">{textString}</h1>;
                 });
               }

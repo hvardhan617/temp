@@ -135,6 +135,13 @@ export async function getServerSideProps({ query }) {
     console.log("campaignData", campaignData);
     const brandData = await getBrandData(campaignData.data.id.brandId);
     console.log("branddata", brandData);
+
+    let stringifyP = JSON.stringify(productData);
+    let stringifyC = JSON.stringify(campaignData);
+    let stringifyB = JSON.stringify(brandData);
+
+    console.log("stringified", stringifyB, stringifyC, stringifyP);
+    
     return {
       props: {
         productData: productData.data,

@@ -49,6 +49,8 @@ const Quantity = () => {
     });
 
     setGlobalState({ ...globalState, multiProductCart: cartItems });
+
+    persistCart(cartItems)
   };
 
   const increaseQuantity = () => {
@@ -76,6 +78,7 @@ const Quantity = () => {
             ...globalState,
             multiProductCart: tempItems,
           });
+          persistCart(tempItems)
         } else {
           setGlobalState({
             ...globalState,
@@ -107,6 +110,8 @@ const Quantity = () => {
         ...globalState,
         multiProductCart: updatedCart,
       });
+      persistCart(updatedCart)
+
       return;
     }
 

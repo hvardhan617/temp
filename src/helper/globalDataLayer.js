@@ -248,15 +248,25 @@ export const getDataLayer = (server) => {
     currency: getCurrency("USD"),
     theme: { ...data.brand.theme },
     productAddedToCart: false,
-    cartItems: getCart() ?? [
-      {
-        ...data.details.variants[0].details[0],
-        quantity: 1,
-        thumbnail:
-          "https://ik.manmatters.com/media/misc/pdp_rcl/26166797/4_-Redensyl-Oil-_600X600_-with-ingredients_xs66fiKuT.png?tr=w-600",
-      },
-    ],
-    multiProductCart: [],
+    cartItems: server.multi
+      ? [
+          {
+            ...data.details.variants[0].details[0],
+            quantity: 1,
+            thumbnail:
+              "https://ik.manmatters.com/media/misc/pdp_rcl/26166797/4_-Redensyl-Oil-_600X600_-with-ingredients_xs66fiKuT.png?tr=w-600",
+          },
+        ]
+      : getCart() ?? [
+          {
+            ...data.details.variants[0].details[0],
+            quantity: 1,
+            thumbnail:
+              "https://ik.manmatters.com/media/misc/pdp_rcl/26166797/4_-Redensyl-Oil-_600X600_-with-ingredients_xs66fiKuT.png?tr=w-600",
+          },
+        ],
+
+    multiProductCart: server.multi ? getCart() ?? [] : [],
     productList: data.productList ? [...data.productList] : undefined,
     selectedStore: "Shopify",
     stores: data.stores,
