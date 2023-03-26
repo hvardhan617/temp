@@ -3,7 +3,7 @@ import styles from '@/styles/Home.module.css'
 import { initEventApps, sendEvent } from '@/helper/EventTracker'
 import { useEffect } from 'react'
 
-const inter = Inter({ subsets: ['latin'] })
+// const inter = Inter({ subsets: ['latin'] })
 
 
 export default function Home() {
