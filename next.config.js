@@ -1,9 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/a/fibr/_next/:path*',
+        destination: '/_next/:path*',
+      },
+    ];
+  },
   reactStrictMode: true,
-  distDir: 'a/fibr',
+  // distDir: 'a/fibr',
   // basePath: '/a/fibr',
-  assetPrefix: 'a/fibr',
+  // assetPrefix: 'a/fibr',
   // webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
   //   // Add a rule to handle custom fonts and change the output path
   //   config.module.rules.push({
