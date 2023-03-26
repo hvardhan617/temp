@@ -2,6 +2,7 @@
     "build": {
       "env": {
         "NEXT_ROUTES_MANIFEST": "/a/fibr/routes-manifest.json"
-      }
+      },
+      "outputDirectory": "a/fibr"
     }
   }
