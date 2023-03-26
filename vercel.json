@@ -1,8 +1,16 @@
 {
+    "version": 2,
+    "builds": [
+      {
+        "src": "next.config.js",
+        "use": "@vercel/next"
+      }
+    ],
     "build": {
-      "env": {
-        "NEXT_ROUTES_MANIFEST": "/a/fibr/routes-manifest.json"
-      },
-      "outputDirectory": "a/fibr"
+        "distDir": "a/fibr",
+        "env": {
+          "NODE_ENV": "production"
+        },
+        "command": "npm run build"
+      }
     }
-  }
