@@ -55,8 +55,8 @@ const Prod = ({ productData, campaignData, brandData }) => {
       <div className="flex flex-row items-center justify-between w-full h-16 py-3 lg:justify-center lg:gap-16">
         <Navbar brandData={brandData} />
       </div>
-      {/* <Pixel />
-      <GA /> */}
+      <Pixel />
+      <GA />
       <div className="flex justify-center w-full ">
         <div className="flex flex-col lg:items-start lg:justify-between lg:flex-row lg:w-[90vw] lg:max-w-[1800px]">
           <div className="lg:w-[32vw] lg:max-w-[768px] xl:w-[36vw] xl:max-w-[768px]">
