@@ -76,28 +76,3 @@ export async function dataCleaning(request) {
 }
 
 
-export const splitLongProductTitle = (title) => {
-  let types = [':', ',', '|'];
-  let shortestTitle = title;
-  let mainTitle = '';
-  types.map((key) => {
-    shortestTitle =
-      shortestTitle.length > title.substring(title.indexOf(key) + 1).length
-        ? title.substring(title.indexOf(key) + 1)
-        : shortestTitle;
-
-    mainTitle =
-      mainTitle.length < title.substring(0, title.indexOf(key)).length
-        ? title.substring(0, title.indexOf(key))
-        : mainTitle;
-  });
-
-  if (mainTitle === '') {
-    mainTitle = title;
-  }
-
-  if (shortestTitle.length > 150) {
-    setHideDecription(true);
-  }
-  return [mainTitle, shortestTitle];
-};

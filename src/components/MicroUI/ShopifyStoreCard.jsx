@@ -67,7 +67,7 @@ const ShopifyStoreCard = () => {
           }}
           onClick={() => {
             sendEvent('Click_Brand_Card_Checkout');
-            window.location = globalState.storesData.Shopify.redirectionURL;
+            window.location = globalState.checkoutDetails.web_url;
           }}
         >
           Buy
@@ -87,7 +87,7 @@ const ShopifyStoreCard = () => {
           }}
           onClick={() => {
             sendEvent('Click_Brand_Card_Checkout');
-            window.location = globalState.storesData.Shopify.redirectionURL;
+            window.location = globalState.checkoutDetails.web_url;
           }}
         >
           Buy

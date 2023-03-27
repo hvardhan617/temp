@@ -4,6 +4,7 @@ import { ProductContext } from "../../context/ProductContext";
 import { checkInCart, removeItemsFromCart } from "../../helper/QuantityHelper";
 import { sendEvent } from "../../helper/EventTracker";
 import { persistCart } from "@/helper/globalDataLayer";
+import { getCartDetails } from "@/helper/apiHelper";
 
 const Quantity = () => {
   const [counter, setCounter] = useState(1);
@@ -33,7 +34,7 @@ const Quantity = () => {
     }
   }, [globalState]);
 
-  const addToCart = () => {
+  const addToCart = async () => {
     sendEvent("Click_Add_To_Cart");
 
     let cartItems = globalState.multiProductCart;
@@ -48,50 +49,137 @@ const Quantity = () => {
       ...details,
     });
 
-    setGlobalState({ ...globalState, multiProductCart: cartItems });
+    let cartArr = cartItems.map((item) => {
+      return {
+        variantId: item._id,
+        quantity: item.quantity,
+      };
+    });
 
-    persistCart(cartItems)
+    let checkoutDetails = await getCartDetails(
+      globalState.campaignData._id,
+      cartArr,
+      ""
+    );
+
+    setGlobalState({
+      ...globalState,
+      checkoutDetails: checkoutDetails ? checkoutDetails.checkout : null,
+      multiProductCart: cartItems,
+      productAddedToCart: true,
+    });
+
+    persistCart(cartItems);
   };
 
-  const increaseQuantity = () => {
+  const increaseQuantity = async () => {
     sendEvent("Click_Increase_Quantity", {
       source: "Man matters 1",
     });
 
     let cartItems = globalState.cartItems;
 
+    let tempItems = [...cartItems];
+
     if (globalState.multi) {
       cartItems = globalState.multiProductCart;
+      let cartArr = [];
+
+      tempItems = [...cartItems];
+
+      cartItems.forEach((item, i) => {
+        if (item._id === globalState.selectedVariant._id) {
+          tempItems[i] = {
+            ...cartItems[i],
+            quantity: cartItems[i].quantity + 1,
+          };
+        }
+
+        cartArr.push({
+          variantId: item._id,
+          quantity: tempItems[i].quantity,
+        });
+      });
+
+      let checkoutDetails = await getCartDetails(
+        globalState.campaignData._id,
+        cartArr,
+        ""
+      );
+
+      setGlobalState({
+        ...globalState,
+        multiProductCart: tempItems,
+        checkoutDetails: checkoutDetails ? checkoutDetails.checkout : null,
+      });
+      persistCart(tempItems);
+
+      return;
     }
 
-    cartItems.forEach((item, i) => {
-      if (item._id === globalState.selectedVariant._id) {
-        let tempItems = [...cartItems];
+    tempItems[0] = {
+      ...cartItems[0],
+      quantity: cartItems[0].quantity + 1,
+    };
 
-        tempItems[i] = {
-          ...cartItems[i],
-          quantity: cartItems[i].quantity + 1,
-        };
+    let cartArr = [
+      {
+        variantId: globalState.selectedVariant._id,
+        quantity: tempItems[0].quantity,
+      },
+    ];
 
-        if (globalState.multi) {
-          setGlobalState({
-            ...globalState,
-            multiProductCart: tempItems,
-          });
-          persistCart(tempItems)
-        } else {
-          setGlobalState({
-            ...globalState,
-            cartItems: tempItems,
-          });
+    let checkoutDetails = await getCartDetails(
+      globalState.campaignData._id,
+      cartArr,
+      ""
+    );
 
-          persistCart(tempItems);
-        }
-      }
-    });
+    if (checkoutDetails) {
+      setGlobalState({
+        ...globalState,
+        cartItems: tempItems,
+        checkoutDetails: checkoutDetails.checkout,
+      });
+    } else {
+      setGlobalState({
+        ...globalState,
+        cartItems: tempItems,
+      });
+    }
+
+    persistCart(tempItems);
+
+    // cartItems.forEach(async (item, i) => {
+    //   if (item._id === globalState.selectedVariant._id) {
+
+    //     if (globalState.multi) {
+    //       setGlobalState({
+    //         ...globalState,
+    //         multiProductCart: tempItems,
+    //       });
+    //       persistCart(tempItems);
+    //     } else {
+    //       if (checkoutDetails) {
+    //         setGlobalState({
+    //           ...globalState,
+    //           cartItems: tempItems,
+    //           checkoutDetails: checkoutDetails.checkout,
+    //         });
+    //       } else {
+    //         setGlobalState({
+    //           ...globalState,
+    //           cartItems: tempItems,
+    //         });
+    //       }
+
+    //       persistCart(tempItems);
+    //     }
+    //   }
+    // });
   };
 
-  const decreaseQuantity = () => {
+  const decreaseQuantity = async () => {
     sendEvent("Click_Decrease_Quantity");
 
     let cartItems = globalState.cartItems;
@@ -106,22 +194,62 @@ const Quantity = () => {
     );
 
     if (globalState.multi) {
+      let productAddedToCart = true;
+      if (updatedCart.length === 0) {
+        productAddedToCart = false;
+      }
+
+      let cartArr = updatedCart.map((item) => {
+        return {
+          variantId: item._id,
+          quantity: item.quantity,
+        };
+      });
+
+      let checkoutDetails = await getCartDetails(
+        globalState.campaignData._id,
+        cartArr,
+        ""
+      );
+
       setGlobalState({
         ...globalState,
+        checkoutDetails: checkoutDetails ? checkoutDetails.checkout : null,
         multiProductCart: updatedCart,
+        productAddedToCart,
       });
-      persistCart(updatedCart)
+      persistCart(updatedCart);
 
       return;
     }
 
-    setGlobalState({
-      ...globalState,
-      cartItems: updatedCart,
-    });
+    let cartArr = [
+      {
+        variantId: globalState.selectedVariant._id,
+        quantity: updatedCart[0].quantity,
+      },
+    ];
+
+    let checkoutDetails = await getCartDetails(
+      globalState.campaignData._id,
+      cartArr,
+      ""
+    );
+
+    if (checkoutDetails) {
+      setGlobalState({
+        ...globalState,
+        cartItems: updatedCart,
+        checkoutDetails: checkoutDetails.checkout,
+      });
+    } else {
+      setGlobalState({
+        ...globalState,
+        cartItems: updatedCart,
+      });
+    }
 
     persistCart(updatedCart);
-
   };
 
   const getAvailability = () => {

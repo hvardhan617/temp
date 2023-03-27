@@ -1,4 +1,5 @@
 import { getCartDetails } from "@/helper/apiHelper";
+import { persistCart } from "@/helper/globalDataLayer";
 import PropTypes from "prop-types";
 import { useContext, useEffect, useState } from "react";
 import { ProductContext } from "../../context/ProductContext";
@@ -9,12 +10,13 @@ const Variants = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const variants = globalState.productDetails.variants[0].details;
   const tempVariantsOptions = globalState.productDetails.options;
-
+  const cartItem = globalState.cartItems[0];
   const [variantOptions, setVariantOption] = useState([...tempVariantsOptions]);
+  console.log("globalState", globalState);
+  console.log("variantOptions", variantOptions);
 
   useEffect(() => {
     console.log("variantusss", globalState.productDetails);
-    let optionObj = {};
 
     let x = { ...globalState.selectedVariant.options };
 
@@ -32,7 +34,27 @@ const Variants = () => {
     setSelectedOption(x);
   }, []);
 
-  const handleOption = (key, value) => {
+  useEffect(() => {
+    console.log("tempVariantsOptions chnaged", tempVariantsOptions);
+    setVariantOption([...tempVariantsOptions]);
+
+    let x = { ...globalState.selectedVariant.options };
+
+    Object.keys(x).map((k) => {
+      if (!x[k].label) {
+        x[k] = {
+          label: x[k],
+          enable: true,
+        };
+      }
+    });
+
+    console.log("xxxx", x);
+
+    setSelectedOption(x);
+  }, [tempVariantsOptions]);
+
+  const handleOption = async (key, value) => {
     sendEvent("Click_Variant_Changed");
 
     let optionObj = {
@@ -48,10 +70,10 @@ const Variants = () => {
 
     const selectedVariant = getMatchedVariant(variants, optionObj);
 
-    getCartDetails('641d875ba520e006c7098e61')
     if (!selectedVariant) {
       return;
     }
+
     let search = window.location.search;
 
     search = search.split("?")[1];
@@ -75,9 +97,23 @@ const Variants = () => {
       storesData: { ...selectedVariant.pricesFromStores },
     };
 
-    if (!globalState.multi) {
+    if (!globalState.productAddedToCart) {
       let cartItems = globalState.cartItems;
       let price = selectedVariant.price;
+      let cartArr = [{
+        variantId: selectedVariant._id,
+        quantity: cartItem.quantity,
+      }]      
+      let checkoutDetails = await getCartDetails(
+        globalState.campaignData._id,
+        cartArr,
+        ""
+      );
+
+      state = {
+        ...state,
+        checkoutDetails: checkoutDetails ? checkoutDetails.checkout : null,
+      };
 
       cartItems[0] = {
         ...cartItems[0],
@@ -91,6 +127,7 @@ const Variants = () => {
         cartItems: cartItems,
       });
 
+      persistCart(cartItems);
       return;
     }
 

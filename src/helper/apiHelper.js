@@ -39,15 +39,24 @@ export async function getCampaignData(id) {
   return data;
 }
 
-export async function getCartDetails(id) {
+export async function getCartDetails(campaignId, cartArr, coupon = "") {
   // let dev = 'https://dev-brands.fibr.shop';
   let staging = "https://staging-api.fibr.shop/product";
 
-  let res = await fetch(`${staging}/pdp/cart/create/${id}`, {
+  let body = {
+    discountCode: "",
+    storeId: "shopify",
+    items: cartArr,
+  };
+
+  let res = await fetch(`${staging}/pdp/cart/create/${campaignId}`, {
     method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
   });
   let data = await res.json();
-  return data;
+  return data.data;
 }
-
-

@@ -24,7 +24,12 @@ const Collection = ({ productData, campaignData, brandData }) => {
   const [hideBottom, setHideBottom] = useState(true);
 
   useEffect(() => {
-    let state = getDataLayer({ data: productData, brandData, multi: true });
+    let state = getDataLayer({
+      data: productData,
+      brandData,
+      multi: true,
+      campaignData,
+    });
     console.log("globaleState", state);
     setExtraContent(true);
     setGlobalState({ ...state });
@@ -86,7 +91,7 @@ const Collection = ({ productData, campaignData, brandData }) => {
             </div>
 
             <div className="lg:w-[36vw] lg:max-w-[850px]">
-            <ProductInfo details={productData.products[0]} />
+              <ProductInfo details={productData.products[0]} />
               {extraContent && (
                 <ExtraContent featured={globalState.brandData.highlights} />
               )}
@@ -141,11 +146,11 @@ export async function getServerSideProps({ query }) {
     let stringifyB = JSON.stringify(brandData);
 
     console.log("stringified", stringifyB, stringifyC, stringifyP);
-    
+
     return {
       props: {
         productData: productData.data,
-        campaignData,
+        campaignData: { ...campaignData.data, _id: query.campaign },
         brandData: brandData.data,
       },
     };
