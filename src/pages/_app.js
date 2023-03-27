@@ -5,16 +5,16 @@ import '@/styles/globals.css'
 import App from 'next/app';
 import ReactGA from 'react-ga';
 
-MyApp.getInitialProps = async (appContext) => {
-  // const apiUrl = process.env.API_URL; // replace with your API URL
-  // const res = await fetch(apiUrl);
-  // const { gaId, pixelId } = await res.json();
-  //  gaId = GTM-N3VZMP4;
-  const pixelId = 590918032795677;
-  const appProps = await App.getInitialProps(appContext);
+// MyApp.getInitialProps = async (appContext) => {
+//   // const apiUrl = process.env.API_URL; // replace with your API URL
+//   // const res = await fetch(apiUrl);
+//   // const { gaId, pixelId } = await res.json();
+//   //  gaId = GTM-N3VZMP4;
+//   // const pixelId = '590918032795677';
+//   // const appProps = await App.getInitialProps(appContext);
 
-  return { ...appProps, pageProps: {pixelId } };
-};
+//   return { ...appProps, pageProps: {pixelId } };
+// };
 const cacheControlMiddleware = (res) => {
   // Set cache time to one week (604800 seconds) and mark as immutable
   res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
@@ -22,15 +22,15 @@ const cacheControlMiddleware = (res) => {
 
 export default function MyApp({ Component, pageProps }) {
   // ReactGA.initialize(pageProps.gaId);
-  useEffect(() => {
-    import('react-facebook-pixel').then(ReactPixel => {
-      ReactPixel.init(pageProps.pixelId);
-    });
-  }, [pageProps.pixelId]);
-  // if (typeof window !== 'undefined') {
-  //   ReactPixel.init(pageProps.pixelId);
-  // }
-  // ReactPixel.init(pageProps.pixelId);
+  // useEffect(() => {
+  //   import('react-facebook-pixel').then(ReactPixel => {
+  //     ReactPixel.init(pageProps.pixelId);
+  //   });
+  // }, [pageProps.pixelId]);
+  // // if (typeof window !== 'undefined') {
+  // //   ReactPixel.init(pageProps.pixelId);
+  // // }
+  // // ReactPixel.init(pageProps.pixelId);
   const router = useRouter();
 
   useEffect(() => {
