@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable Automatic Static Optimization
-  // See: https://nextjs.org/docs/advanced-features/automatic-static-optimization
-  target: 'serverless',
-  ssg: true,
   async rewrites() {
     return [
       {
