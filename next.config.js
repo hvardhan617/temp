@@ -1,18 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable Automatic Static Optimization
+  // See: https://nextjs.org/docs/advanced-features/automatic-static-optimization
+  target: 'serverless',
+  ssg: true,
   async rewrites() {
-    const rewrites = [
-      // {
-      //   "source": "/:path*",
-      //   "destination": "/_next/:path*",
-      //   "has": [
-      //     {
-      //       "type": "query",
-      //       "key": "pathname",
-      //       "value": "/_next/"
-      //     }
-      //   ]
-      // },
+    return [
       {
         source: '/a/fibr/_next/static/:path*',
         destination: '/_next/static/:path*',
@@ -22,14 +15,6 @@ const nextConfig = {
         destination: '/:path*',
       },  
     ];
-  
-    // Loop through each rewrite and log input/output
-    rewrites.forEach((rewrite) => {
-      const { source, destination } = rewrite;
-      console.log(`Rewriting "${source}" to "${destination}"`);
-    });
-  
-    return rewrites;
   },
   
   reactStrictMode: true,
