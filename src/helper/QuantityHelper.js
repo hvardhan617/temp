@@ -76,12 +76,12 @@ export const calculatePercentage = (sellingPrice, slashPrice) => {
 };
 
 export const calculateFinalCart = (store, prices) => {
-  let finalPrice = 0,
     // additionalSaving = 0,
-    percentageMsg = '';
+   let percentageMsg = '';
   // let totalSavings = 0;
 
-  finalPrice = prices.totalSellingPrice;
+  console.log('prices--->', prices);
+  let finalPrice = prices.totalSellingPrice;
   percentageMsg = calculatePercentage(finalPrice, prices.totalCostPrice);
 
   return {

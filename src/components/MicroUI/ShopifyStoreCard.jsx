@@ -32,6 +32,7 @@ const ShopifyStoreCard = () => {
     let totalPrices = getTotal(globalState.cartItems, store);
     let { finalPrice, msg } = calculateFinalCart(store, totalPrices);
 
+    console.log("checkout details", totalPrices, finalPrice, msg);
     setPriceDetails({
       finalPrice,
       msg,
@@ -72,10 +73,12 @@ const ShopifyStoreCard = () => {
               <p className="text-[14px] font-semibold text-red-500">
                 {priceDetails.msg}
               </p>
-              {priceDetails.finalPrice !== priceDetails.costPrice && <del className="text-[14px] font-normal text-zinc-400 leading-3">
-                {globalState.currency}
-                {priceDetails.costPrice}
-              </del>}
+              {priceDetails.finalPrice !== priceDetails.costPrice && (
+                <del className="text-[14px] font-normal text-zinc-400 leading-3">
+                  {globalState.currency}
+                  {priceDetails.costPrice}
+                </del>
+              )}
             </div>
             <p className="text-3xl font-semibold">
               {globalState.currency}

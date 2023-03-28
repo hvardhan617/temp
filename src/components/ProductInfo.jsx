@@ -54,7 +54,10 @@ const ProductInfo = ({ details }) => {
             <p className="w-full lg:h-full text-[20px] font-semibold text-slate-800 lg:text-3xl lg:flex overflowText">
               {splitLongProductTitle(productDetails.title)[0]}
             </p>
-            <Rating count={5} ratingCount={10} />
+            <Rating
+              count={5}
+              ratingCount={100}
+            />
           </div>
           <div className="w-[50%] lg:hidden">
             <div className="flex flex-col items-end justify-between h-full gap-2 pt-1 lg:items-start lg:hidden">
