@@ -120,6 +120,9 @@ export async function getServerSideProps({ query }) {
     const productData = await getProductsData(query.id);
     const campaignData = await getCampaignData(query.campaign);
     const brandData = await getBrandData(campaignData.data.id.brandId);
+
+    console.log("response data",campaignData.data.id.brandId );
+    
     let data = {
       productData: productData.data,
       campaignData: { ...campaignData.data, _id: query.campaign },
