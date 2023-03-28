@@ -17,7 +17,7 @@ import ReactGA from 'react-ga';
 // };
 const cacheControlMiddleware = (res) => {
   // Set cache time to one week (604800 seconds) and mark as immutable
-  res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+  // res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
 };
 
 export default function MyApp({ Component, pageProps }) {
