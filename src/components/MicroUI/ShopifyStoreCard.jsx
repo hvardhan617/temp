@@ -1,7 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { ProductContext } from "../../context/ProductContext";
 import Tag from "./CheckoutComponents/Tag";
-import { calculateFinalCart, getTotal } from "../../helper/QuantityHelper";
+import {
+  calculateFinalCart,
+  calculatePercentage,
+  getTotal,
+} from "../../helper/QuantityHelper";
 import RightArrowIcon from "../Icons/RightArrowIcon";
 import Box from "@/components/Icons/Box.svg";
 import { sendEvent } from "../../helper/EventTracker";
@@ -22,6 +26,8 @@ const ShopifyStoreCard = () => {
     ...globalState.theme,
   };
 
+  const checkoutDetails = globalState.checkoutDetails;
+
   const [priceDetails, setPriceDetails] = useState({
     finalPrice: 0,
     costPrice: 0,
@@ -39,95 +45,102 @@ const ShopifyStoreCard = () => {
       costPrice: totalPrices.totalCostPrice,
     });
   }, [globalState]);
-
-  return (
-    <div className="w-full border-y-[1px] border-zinc-100 flex flex-col justify-between gap-1 pb-4">
-      <div className="flex justify-between gap-4">
-        <Tag title="BEST DEAL" />
-        <div className="lg:hidden">
-          {getCouponCode(globalState.campaignData) !== "" && (
-            <CouponCard couponName={getCouponCode(globalState.campaignData)} />
-          )}
-        </div>
-      </div>
-      <div className="flex items-center justify-between lg:items-end">
-        <div className="flex flex-col justify-start gap-2">
-          <div className="flex items-center gap-2">
-            <img
-              src={brandData.logo.url}
-              className="object-contain w-20 h-16"
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center justify-center gap-2">
-          <div className="hidden lg:flex">
+  if (checkoutDetails) {
+    return (
+      <div className="w-full border-y-[1px] border-zinc-100 flex flex-col justify-between gap-1 pb-4">
+        <div className="flex justify-between gap-4">
+          <Tag title="BEST DEAL" />
+          <div className="lg:hidden">
             {getCouponCode(globalState.campaignData) !== "" && (
-              <CouponCard1
+              <CouponCard
                 couponName={getCouponCode(globalState.campaignData)}
               />
             )}
           </div>
-          <div className="flex items-center justify-end gap-3 storeCard">
-            <div className="flex flex-col items-end">
-              <p className="text-[14px] font-semibold text-red-500">
-                {priceDetails.msg}
-              </p>
-              {priceDetails.finalPrice !== priceDetails.costPrice && (
-                <del className="text-[14px] font-normal text-zinc-400 leading-3">
-                  {globalState.currency}
-                  {priceDetails.costPrice}
-                </del>
+        </div>
+        <div className="flex items-center justify-between lg:items-end">
+          <div className="flex flex-col justify-start gap-2">
+            <div className="flex items-center gap-2">
+              <img
+                src={brandData.logo.url}
+                className="object-contain w-20 h-16"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="hidden lg:flex">
+              {getCouponCode(globalState.campaignData) !== "" && (
+                <CouponCard1
+                  couponName={getCouponCode(globalState.campaignData)}
+                />
               )}
             </div>
-            <p className="text-3xl font-semibold">
-              {globalState.currency}
-              {priceDetails.finalPrice}
-            </p>
+            <div className="flex items-center justify-end gap-3 storeCard">
+              <div className="flex flex-col items-end">
+                <p className="text-[14px] font-semibold text-red-500">
+                  {calculatePercentage(
+                    checkoutDetails.total_price,
+                    checkoutDetails.total_line_items_price
+                  )}
+                </p>
+                {checkoutDetails.total_price !==
+                  checkoutDetails.total_line_items_price && (
+                  <del className="text-[14px] font-normal text-zinc-400 leading-3">
+                    {globalState.currency}
+                    {checkoutDetails.total_line_items_price}
+                  </del>
+                )}
+              </div>
+              <p className="text-3xl font-semibold">
+                {globalState.currency}
+                {checkoutDetails.total_price}
+              </p>
+            </div>
           </div>
+          <button
+            className="items-center justify-center hidden w-32 gap-3 font-semibold text-white bg-black rounded-md lg:flex h-14 disabled:bg-zinc-500"
+            id="checkOut1"
+            disabled={OutofStock}
+            style={{
+              backgroundColor: OutofStock ? "#8c8c8c" : theme.solid,
+              color: theme.text,
+            }}
+            onClick={() => {
+              sendEvent("Click_Brand_Card_Checkout");
+              window.location = globalState.checkoutDetails.web_url;
+            }}
+          >
+            Buy
+            <RightArrowIcon />{" "}
+          </button>
         </div>
-        <button
-          className="items-center justify-center hidden w-32 gap-3 font-semibold text-white bg-black rounded-md lg:flex h-14 disabled:bg-zinc-500"
-          id="checkOut1"
-          disabled={OutofStock}
-          style={{
-            backgroundColor: OutofStock ? "#8c8c8c" : theme.solid,
-            color: theme.text,
-          }}
-          onClick={() => {
-            sendEvent("Click_Brand_Card_Checkout");
-            window.location = globalState.checkoutDetails.web_url;
-          }}
-        >
-          Buy
-          <RightArrowIcon />{" "}
-        </button>
-      </div>
 
-      <div className="flex items-center justify-between w-full gap-3 lg:gap-9 lg:mt-3">
-        <ShippingCard
-          shipping={brandData.shipping}
-          shippingIncluded={store.shippingIncluded}
-        />
-        <button
-          className="flex items-center justify-center w-32 gap-3 font-semibold text-white bg-black rounded-md lg:hidden h-14"
-          id="checkOut2"
-          disabled={OutofStock}
-          style={{
-            backgroundColor: OutofStock ? "#8c8c8c" : theme.solid,
-            color: theme.text,
-          }}
-          onClick={() => {
-            sendEvent("Click_Brand_Card_Checkout");
-            window.location = globalState.checkoutDetails.web_url;
-          }}
-        >
-          Buy
-          <RightArrowIcon />{" "}
-        </button>
+        <div className="flex items-center justify-between w-full gap-3 lg:gap-9 lg:mt-3">
+          <ShippingCard
+            shipping={brandData.shipping}
+            shippingIncluded={store.shippingIncluded}
+          />
+          <button
+            className="flex items-center justify-center w-32 gap-3 font-semibold text-white bg-black rounded-md lg:hidden h-14"
+            id="checkOut2"
+            disabled={OutofStock}
+            style={{
+              backgroundColor: OutofStock ? "#8c8c8c" : theme.solid,
+              color: theme.text,
+            }}
+            onClick={() => {
+              sendEvent("Click_Brand_Card_Checkout");
+              window.location = globalState.checkoutDetails.web_url;
+            }}
+          >
+            Buy
+            <RightArrowIcon />{" "}
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 };
 
 const CouponCard = ({ couponName }) => {
