@@ -4,26 +4,36 @@ import Navbar from "@/components/Layout/Navbar";
 import ImageSlider from "@/components/MicroUI/ImageSlider";
 import ProductInfo from "@/components/ProductInfo";
 import { ProductContext } from "@/context/ProductContext";
+import {
+  getBrandData,
+  getCampaignData,
+  getCartDetails,
+  getProductsData,
+} from "@/helper/apiHelper";
 import { initEventApps } from "@/helper/EventTracker";
-import { getDataLayer } from "@/helper/globalDataLayer";
-import { isInViewport } from "@/helper/utilityHelper";
+import { getDataLayer, persistCart } from "@/helper/globalDataLayer";
+import { getCouponCode, isInViewport } from "@/helper/utilityHelper";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import Script from "next/script";
 import React, { useContext, useEffect, useState } from "react";
 
-const Prod = ({ productData, campaignData, brandData }) => {
+const Prod = ({ data }) => {
   const router = useRouter();
   const { id } = router.query;
   const { globalState, setGlobalState } = useContext(ProductContext);
   const [extraContent, setExtraContent] = useState(false);
 
   const [hideBottom, setHideBottom] = useState(true);
-
+  let { productData, campaignData, brandData } = data;
   useEffect(() => {
-    let state = getDataLayer({ data: productData, brandData });
-    console.log("globaleState", state);
+    let state = getDataLayer({ productData, brandData, campaignData });
     setExtraContent(true);
     setGlobalState({ ...state });
-    initEventApps();
+    initGlobalState(state);
+    if (typeof window !== undefined) {
+      initEventApps();
+    }
 
     setTimeout(() => {
       toggleBottomBar();
@@ -32,7 +42,31 @@ const Prod = ({ productData, campaignData, brandData }) => {
     document.addEventListener("scroll", toggleBottomBar, {
       passive: true,
     });
+
+    persistCart(state.cartItems);
   }, []);
+
+  const initGlobalState = async (state) => {
+    console.log("initGlobalState", state);
+    let cartArr = [
+      {
+        variantId: state.selectedVariant._id,
+        quantity: state.cartItems[0].quantity,
+      },
+    ];
+
+    console.log(
+      "getCouponCode(state.campaignData)",
+      getCouponCode(state.campaignData)
+    );
+
+    let checkoutDetails = await getCartDetails(
+      state.campaignData._id,
+      cartArr,
+      getCouponCode(state.campaignData)
+    );
+    setGlobalState({ ...state, checkoutDetails: checkoutDetails.checkout });
+  };
 
   const toggleBottomBar = () => {
     const box = document.querySelector(".storeCard");
@@ -44,6 +78,8 @@ const Prod = ({ productData, campaignData, brandData }) => {
       <div className="flex flex-row items-center justify-between w-full h-16 py-3 lg:justify-center lg:gap-16">
         <Navbar brandData={brandData} />
       </div>
+      <Pixel />
+      <GA />
       <div className="flex justify-center w-full ">
         <div className="flex flex-col lg:items-start lg:justify-between lg:flex-row lg:w-[90vw] lg:max-w-[1800px]">
           <div className="lg:w-[32vw] lg:max-w-[768px] xl:w-[36vw] xl:max-w-[768px]">
@@ -65,7 +101,7 @@ const Prod = ({ productData, campaignData, brandData }) => {
 
           <div className="lg:w-[45vw] lg:max-w-[850px]">
             <ProductInfo details={productData} />
-            {extraContent && (
+            {extraContent && globalState && (
               <ExtraContent featured={globalState.brandData.highlights} />
             )}
           </div>
@@ -81,19 +117,21 @@ export default Prod;
 export async function getServerSideProps({ query }) {
   try {
     console.log("query1122", JSON.stringify(query));
-
     const productData = await getProductsData(query.id);
-    console.log("productData", productData);
     const campaignData = await getCampaignData(query.campaign);
-    console.log("campaignData", campaignData);
     const brandData = await getBrandData(campaignData.data.id.brandId);
-    console.log("branddata", brandData);
+
+    console.log("response data",campaignData.data.id.brandId );
+    
+    let data = {
+      productData: productData.data,
+      campaignData: { ...campaignData.data, _id: query.campaign },
+      brandData: brandData.data,
+    };
+
+    console.log("All data ---->", data);
     return {
-      props: {
-        productData: productData.data,
-        campaignData,
-        brandData: brandData.data,
-      },
+      props: { data },
     };
   } catch (error) {
     return {
@@ -104,43 +142,48 @@ export async function getServerSideProps({ query }) {
   }
 }
 
-async function getProductsData(id) {
-  // let dev = 'https://myapi.fibr.shop/';
-  let staging = "https://staging-api.fibr.shop/product";
-  let res = await fetch(`${staging}/pdp/products/${id}`, {
-    method: "GET",
-  });
-  let data = await res.json();
-  return data;
-}
+const Pixel = () => {
+  useEffect(() => {
+    !(function (f, b, e, v, n, t, s) {
+      if (f.fbq) return;
+      n = f.fbq = function () {
+        n.callMethod
+          ? n.callMethod.apply(n, arguments)
+          : n.queue.push(arguments);
+      };
+      if (!f._fbq) f._fbq = n;
+      n.push = n;
+      n.loaded = !0;
+      n.version = "2.0";
+      n.queue = [];
+      t = b.createElement(e);
+      t.async = !0;
+      t.src = v;
+      s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s);
+    })(
+      window,
+      document,
+      "script",
+      "https://connect.facebook.net/en_US/fbevents.js"
+    );
+    fbq("init", "590918032795677");
+    fbq("track", "PageView");
+  }, []);
 
-async function getBrandData(id) {
-  // let dev = 'https://brands-api.fibr.shop/';
-  let staging = "https://staging-api.fibr.shop/brand";
-  let res = await fetch(`${staging}/pdp/brand/${id}`, {
-    method: "GET",
-  });
-  let data = await res.json();
-  return data;
-}
+  return null;
+};
 
-async function getCollectionData(id) {
-  let staging = "https://staging-api.fibr.shop/product";
+const GA = () => {
+  useEffect(() => {
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
 
-  let res = await fetch(`${staging}/pdp/product-groups/${id}`, {
-    method: "GET",
-  });
-  let data = await res.json();
-  return data;
-}
+    gtag("config", "G-YZ3X85LCKZ");
+  }, []);
 
-async function getCampaignData(id) {
-  // let dev = 'https://dev-brands.fibr.shop';
-  let staging = "https://staging-api.fibr.shop/brand";
-
-  let res = await fetch(`${staging}/pdp/campaign/${id}`, {
-    method: "GET",
-  });
-  let data = await res.json();
-  return data;
-}
+  return null;
+};

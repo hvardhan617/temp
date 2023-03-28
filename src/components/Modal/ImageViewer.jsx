@@ -18,15 +18,15 @@ const ImageViewer = ({ images, review, handleImageViewer, userImages }) => {
   }, []);
 
   return (
-    <div className="fixed h-screen left-0 bottom-0 w-full bg-black bg-opacity-90 flex flex-col z-40 justify-center items-center">
+    <div className="fixed bottom-0 left-0 z-40 flex flex-col items-center justify-center w-full h-screen bg-black bg-opacity-90">
       <div className="w-full lg:max-w-[65%] h-screen flex flex-col justify-center items-center gap-4">
-        <div className="flex justify-between items-start w-full px-4 lg:px-0">
+        <div className="flex items-start justify-between w-full px-4 lg:px-0">
           <div>
             <p className="text-sm font-semibold text-white lg:w-full">
-              {globalState.selectedVariant.title}
+              {globalState.productDetails.title}
             </p>
             <div
-              className="ratingLayout mt-2"
+              className="mt-2 ratingLayout"
               onClick={() =>
                 document.getElementById('reviewSection').scrollIntoView({
                   block: 'start',
@@ -34,11 +34,11 @@ const ImageViewer = ({ images, review, handleImageViewer, userImages }) => {
                 })
               }
             >
-              <p className="font-semibold text-white text-lg">4.5</p>
+              <p className="text-lg font-semibold text-white">4.5</p>
               <Rating v2 count={5} />
             </div>
           </div>
-          <div className="text-zinc-200 px-2" onClick={() => handleImageViewer(false)}>
+          <div className="px-2 text-zinc-200" onClick={() => handleImageViewer(false)}>
             <CancelIcon />
           </div>
         </div>
@@ -80,7 +80,7 @@ const ImageViewer = ({ images, review, handleImageViewer, userImages }) => {
               <div className="p-5 border-[1px] border-zinc-200 rounded-lg">
                 <div className="flex justify-between border-b-[0.5px] border-zinc-200 pb-4">
                   <div>
-                    <p className="text-sm font-semibold mb-1 text-white">
+                    <p className="mb-1 text-sm font-semibold text-white">
                       {review.review.customer}
                     </p>
                     <Rating v2 count={review.review.rating} />
@@ -89,8 +89,8 @@ const ImageViewer = ({ images, review, handleImageViewer, userImages }) => {
                 </div>
                 {
                   <div className="mt-4">
-                    <p className="font-semibold text-sm text-white">{review.review.title}</p>
-                    <p className="text-xs text-white mt-2 font-light">{review.review.comment}</p>
+                    <p className="text-sm font-semibold text-white">{review.review.title}</p>
+                    <p className="mt-2 text-xs font-light text-white">{review.review.comment}</p>
                   </div>
                 }{' '}
               </div>

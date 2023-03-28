@@ -44,6 +44,7 @@ export const getTotalAmazon = (items) => {
   let totalSellingPrice = 0;
   let totalCostPrice = 0;
   let totalSavings = 0;
+
   items.forEach((item) => {
     let amazon = item.pricesFromStores.filter((store) => store.storeId === 'amazon.com')[0];
     totalSellingPrice = totalSellingPrice + item.quantity * amazon.listPrice;

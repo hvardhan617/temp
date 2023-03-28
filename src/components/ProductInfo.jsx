@@ -13,9 +13,37 @@ const ProductInfo = ({ details }) => {
   const { globalState } = useContext(ProductContext);
   const [hideDecription, setHideDecription] = useState(false);
 
+  const splitLongProductTitle = (title) => {
+    if (title.length < 20) {
+      return [title, title];
+    }
+    let types = [":", ",", "|"];
+    let shortestTitle = title;
+    let mainTitle = "";
+    types.map((key) => {
+      shortestTitle =
+        shortestTitle.length > title.substring(title.indexOf(key) + 1).length
+          ? title.substring(title.indexOf(key) + 1)
+          : shortestTitle;
+
+      mainTitle =
+        mainTitle.length < title.substring(0, title.indexOf(key)).length
+          ? title.substring(0, title.indexOf(key))
+          : mainTitle;
+    });
+
+    if (mainTitle === "") {
+      mainTitle = title;
+    }
+
+    if (shortestTitle.length > 150) {
+      setHideDecription(true);
+    }
+    return [mainTitle, shortestTitle];
+  };
+
   if (globalState) {
     const productDetails = globalState.productDetails;
-    console.log("productDetails", globalState);
     const shopifyPrice = globalState.selectedVariant.pricesFromStores.filter(
       (store) => store.storeId === "shopify"
     )[0];

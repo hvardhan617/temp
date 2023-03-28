@@ -1,36 +1,47 @@
 // import data from './../src/data/auric';
 // import data from './../src/data/manmatter';
-import data from './../src/data/boat';
+import data from "./../src/data/boat";
 // import data from './../src/data/littlejoys1';
 export const getData = () => {
   return { ...data };
 };
 
 export const getServerData = async () => {
-  let res = await fetch('https://dev-products.fibr.shop/pdp/product/63edfbd50bc94b2355e85173', {
-    method: 'GET',
-  });
+  let res = await fetch(
+    "https://dev-products.fibr.shop/pdp/product/63edfbd50bc94b2355e85173",
+    {
+      method: "GET",
+    }
+  );
   let data = await res.json();
   return data;
 };
 
 export const getReviewsData = async (id) => {
   // let staging = 'https://staging-api.fibr.shop/product/';
-  let res = await fetch(`https://staging-api.fibr.shop/product/pdp/product-reviews/${id}`, {
-    method: 'GET',
-  });
+  let res = await fetch(
+    `https://staging-api.fibr.shop/product/pdp/product-reviews/${id}`,
+    {
+      method: "GET",
+    }
+  );
   let data = await res.json();
   return data;
 };
 
 export const getLatestVariantPrices = async (id) => {
   // let dev = 'https://dev-products.fibr.shop/pdp/price-availability';
-  let staging = 'https://staging-api.fibr.shop/product/pdp/price-availability';
-  let res = await fetch(`${staging}/${id}`, {
-    method: 'GET',
-  });
-  let data = await res.json();
-  return data.data;
+  try {
+    let staging =
+      "https://staging-api.fibr.shop/product/pdp/price-availability";
+    let res = await fetch(`${staging}/${id}`, {
+      method: "GET",
+    });
+    let data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.log("error", errror);
+  }
 };
 // productList: [
 //   {

@@ -8,8 +8,10 @@ import { sendEvent } from "../../helper/EventTracker";
 
 const Navbar = ({ brandData, setOpenCart }) => {
   // const brandData = globalState.brandData
+  const { globalState, setGlobalState } = useContext(ProductContext);
+
   return (
-    <div className="flex justify-center w-full lg:fixed p-3 border-b-[1px] border-zinc-200 bg-white top-0 z-10">
+    <div className="flex justify-center w-full lg:fixed p-3 border-b-[1px] border-zinc-200 bg-white top-0 z-20">
       <div
         className={`w-full lg:w-[90vw] flex justify-between lg:px-4 lg:max-w-[1800px] ${
           setOpenCart ? "lg:gap-24" : ""
@@ -31,7 +33,7 @@ const Navbar = ({ brandData, setOpenCart }) => {
           <div className="px-2">
             <SocialCounter social={brandData.socialMedia} />
           </div>
-          {setOpenCart && (
+          {globalState && setOpenCart && (
             <div
               className={`hidden relative lg:grid ${
                 globalState.multiProductCart.length > 0
@@ -43,7 +45,7 @@ const Navbar = ({ brandData, setOpenCart }) => {
               <p className="rounded-full bg-purple-800 text-[8px] text-white px-1 text-center absolute top-0 right-0">
                 {calculateTotalItems(globalState.multiProductCart, true)}
               </p>
-              <img className="" src={cartIcon} />
+              <img className="" src={cartIcon.src} />
             </div>
           )}
         </div>
