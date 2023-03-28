@@ -2,7 +2,7 @@
 
 import mixpanel from "mixpanel-browser";
 // import ReactPixel from 'react-facebook-pixel';
-import ReactGA from "react-ga";
+import ReactGA from "react-ga4";
 
 const sendMixPanelEvent = (eventName, extras) => {
   mixpanel.track(eventName, extras);
@@ -11,8 +11,8 @@ const sendMixPanelEvent = (eventName, extras) => {
 
 export const initEventApps = () => {
   mixpanel.init("912d68a7f947fbc07f7a883043c61079", { debug: true });
-  //   ReactPixel.init('590918032795677');
-  ReactGA.initialize("G-5STMS50L5E");
+  // ReactPixel.init('590918032795677');
+  ReactGA.initialize("G-PDVX1QFG0G");
 };
 
 export const sendEvent = (eventName, extras = {}) => {
