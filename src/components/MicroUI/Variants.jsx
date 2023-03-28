@@ -110,7 +110,7 @@ const Variants = () => {
         cartArr,
         getCouponCode(globalState.campaignData)
       );
-
+      
       state = {
         ...state,
         checkoutDetails: checkoutDetails ? checkoutDetails.checkout : null,
