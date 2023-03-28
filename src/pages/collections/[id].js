@@ -6,9 +6,10 @@ import ImageSlider from "@/components/MicroUI/ImageSlider";
 import ProductList from "@/components/Multiproduct/ProductList";
 import ProductInfo from "@/components/ProductInfo";
 import { ProductContext } from "@/context/ProductContext";
+import { getCartDetails } from "@/helper/apiHelper";
 import { initEventApps } from "@/helper/EventTracker";
 import { getDataLayer } from "@/helper/globalDataLayer";
-import { isInViewport } from "@/helper/utilityHelper";
+import { getCouponCode, isInViewport } from "@/helper/utilityHelper";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
@@ -24,10 +25,15 @@ const Collection = ({ productData, campaignData, brandData }) => {
   const [hideBottom, setHideBottom] = useState(true);
 
   useEffect(() => {
-    let state = getDataLayer({ data: productData, brandData, multi: true });
-    console.log("globaleState", state);
+    let state = getDataLayer({
+      data: productData,
+      brandData,
+      multi: true,
+      campaignData,
+    });
     setExtraContent(true);
     setGlobalState({ ...state });
+    initGlobalState(state);
     if (typeof window !== undefined) {
       initEventApps();
     }
@@ -41,6 +47,28 @@ const Collection = ({ productData, campaignData, brandData }) => {
     });
   }, []);
 
+  const initGlobalState = async (state) => {
+    console.log("initGlobalState", state);
+    let cartArr = [
+      {
+        variantId: state.selectedVariant._id,
+        quantity: state.cartItems[0].quantity,
+      },
+    ];
+
+    console.log(
+      "getCouponCode(state.campaignData)",
+      getCouponCode(state.campaignData)
+    );
+
+    let checkoutDetails = await getCartDetails(
+      state.campaignData._id,
+      cartArr,
+      getCouponCode(state.campaignData)
+    );
+    setGlobalState({ ...state, checkoutDetails: checkoutDetails.checkout });
+  };
+
   const toggleBottomBar = () => {
     const box = document.querySelector(".storeCard");
     isInViewport(box) ? setHideBottom(true) : setHideBottom(false);
@@ -52,6 +80,9 @@ const Collection = ({ productData, campaignData, brandData }) => {
 
   return (
     <div className="relative">
+      <Head>
+        <title></title>
+      </Head>
       <div className="flex flex-row justify-between lg:justify-center items-center w-full lg:gap-16 h-[53px]">
         <Navbar setOpenCart={handleCart} brandData={brandData} />
       </div>
@@ -86,7 +117,7 @@ const Collection = ({ productData, campaignData, brandData }) => {
             </div>
 
             <div className="lg:w-[36vw] lg:max-w-[850px]">
-            <ProductInfo details={productData.products[0]} />
+              <ProductInfo details={productData.products[0]} />
               {extraContent && (
                 <ExtraContent featured={globalState.brandData.highlights} />
               )}
@@ -126,36 +157,28 @@ const Collection = ({ productData, campaignData, brandData }) => {
 export default Collection;
 
 export async function getServerSideProps({ query }) {
-  try {
-    console.log("query1122", JSON.stringify(query));
+  console.log("query1122", JSON.stringify(query));
 
-    const productData = await getCollectionData(query.id);
-    console.log("productData", productData);
-    const campaignData = await getCampaignData(query.campaign);
-    console.log("campaignData", campaignData);
-    const brandData = await getBrandData(campaignData.data.id.brandId);
-    console.log("branddata", brandData);
+  const productData = await getCollectionData(query.id);
+  console.log("productData", productData);
+  const campaignData = await getCampaignData(query.campaign);
+  console.log("campaignData", campaignData);
+  const brandData = await getBrandData(campaignData.data.id.brandId);
+  console.log("branddata", brandData);
 
-    let stringifyP = JSON.stringify(productData);
-    let stringifyC = JSON.stringify(campaignData);
-    let stringifyB = JSON.stringify(brandData);
+  let stringifyP = JSON.stringify(productData);
+  let stringifyC = JSON.stringify(campaignData);
+  let stringifyB = JSON.stringify(brandData);
 
-    console.log("stringified", stringifyB, stringifyC, stringifyP);
-    
-    return {
-      props: {
-        productData: productData.data,
-        campaignData,
-        brandData: brandData.data,
-      },
-    };
-  } catch (error) {
-    return {
-      props: {
-        error,
-      },
-    };
-  }
+  console.log("stringified", stringifyB, stringifyC, stringifyP);
+
+  return {
+    props: {
+      productData: productData.data,
+      campaignData: { ...campaignData.data, _id: query.campaign },
+      brandData: brandData.data,
+    },
+  };
 }
 
 async function getProductsData(id) {

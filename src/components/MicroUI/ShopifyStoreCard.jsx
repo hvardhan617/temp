@@ -1,22 +1,24 @@
-import { useContext, useEffect } from 'react';
-import { ProductContext } from '../../context/ProductContext';
-import Tag from './CheckoutComponents/Tag';
-import { calculateFinalCart, getTotal } from '../../helper/QuantityHelper';
-import RightArrowIcon from '../Icons/RightArrowIcon';
-import Box from '@/components/Icons/Box.svg';
-import { sendEvent } from '../../helper/EventTracker';
-import PropTypes from 'prop-types';
+import { useContext, useEffect } from "react";
+import { ProductContext } from "../../context/ProductContext";
+import Tag from "./CheckoutComponents/Tag";
+import { calculateFinalCart, getTotal } from "../../helper/QuantityHelper";
+import RightArrowIcon from "../Icons/RightArrowIcon";
+import Box from "@/components/Icons/Box.svg";
+import { sendEvent } from "../../helper/EventTracker";
+import PropTypes from "prop-types";
+import { getCouponCode } from "@/helper/utilityHelper";
 
 const ShopifyStoreCard = () => {
   const { globalState } = useContext(ProductContext);
   const store = globalState.selectedVariant.pricesFromStores.filter(
-    (store) => store.storeId === 'shopify'
+    (store) => store.storeId === "shopify"
   )[0];
-  const OutofStock = globalState.selectedVariant.availability.currentStock === 0;
+  const OutofStock =
+    globalState.selectedVariant.availability.currentStock === 0;
   const brandData = globalState.brandData;
   const theme = {
-    solid: '#2D2D2D',
-    outline: '#2D2D2D',
+    solid: "#2D2D2D",
+    outline: "#2D2D2D",
     ...globalState.theme,
   };
 
@@ -27,24 +29,38 @@ const ShopifyStoreCard = () => {
       <div className="flex justify-between gap-4">
         <Tag title="BEST DEAL" />
         <div className="lg:hidden">
-          <CouponCard />
+          {getCouponCode(globalState.campaignData) !== "" && (
+            <CouponCard couponName={getCouponCode(globalState.campaignData)} />
+          )}
         </div>
       </div>
       <div className="flex items-center justify-between lg:items-end">
         <div className="flex flex-col justify-start gap-2">
           <div className="flex items-center gap-2">
-            <img src={brandData.logo.url} className="object-contain w-20 h-16" />
+            <img
+              src={brandData.logo.url}
+              className="object-contain w-20 h-16"
+            />
           </div>
         </div>
 
         <div className="flex flex-col items-center justify-center gap-2">
           <div className="hidden lg:flex">
-            <CouponCard1 />
+            {getCouponCode(globalState.campaignData) !== "" && (
+              <CouponCard1
+                couponName={getCouponCode(globalState.campaignData)}
+              />
+            )}
           </div>
           <div className="flex items-center justify-end gap-3 storeCard">
             <div className="flex flex-col items-end">
               <p className="text-[14px] font-semibold text-red-500">
-                {calculateFinalCart(store, getTotal(globalState.cartItems, store)).msg}
+                {
+                  calculateFinalCart(
+                    store,
+                    getTotal(globalState.cartItems, store)
+                  ).msg
+                }
               </p>
               <del className="text-[14px] font-normal text-zinc-400 leading-3">
                 {globalState.currency}
@@ -53,7 +69,12 @@ const ShopifyStoreCard = () => {
             </div>
             <p className="text-3xl font-semibold">
               {globalState.currency}
-              {calculateFinalCart(store, getTotal(globalState.cartItems, store)).finalPrice}
+              {
+                calculateFinalCart(
+                  store,
+                  getTotal(globalState.cartItems, store)
+                ).finalPrice
+              }
             </p>
           </div>
         </div>
@@ -62,62 +83,65 @@ const ShopifyStoreCard = () => {
           id="checkOut1"
           disabled={OutofStock}
           style={{
-            backgroundColor: OutofStock ? '#8c8c8c' : theme.solid,
+            backgroundColor: OutofStock ? "#8c8c8c" : theme.solid,
             color: theme.text,
           }}
           onClick={() => {
-            sendEvent('Click_Brand_Card_Checkout');
-            window.location = globalState.storesData.Shopify.redirectionURL;
+            sendEvent("Click_Brand_Card_Checkout");
+            window.location = globalState.checkoutDetails.web_url;
           }}
         >
           Buy
-          <RightArrowIcon />{' '}
+          <RightArrowIcon />{" "}
         </button>
       </div>
 
       <div className="flex items-center justify-between w-full gap-3 lg:gap-9 lg:mt-3">
-        <ShippingCard shipping={brandData.shipping} shippingIncluded={store.shippingIncluded} />
+        <ShippingCard
+          shipping={brandData.shipping}
+          shippingIncluded={store.shippingIncluded}
+        />
         <button
           className="flex items-center justify-center w-32 gap-3 font-semibold text-white bg-black rounded-md lg:hidden h-14"
           id="checkOut2"
           disabled={OutofStock}
           style={{
-            backgroundColor: OutofStock ? '#8c8c8c' : theme.solid,
+            backgroundColor: OutofStock ? "#8c8c8c" : theme.solid,
             color: theme.text,
           }}
           onClick={() => {
-            sendEvent('Click_Brand_Card_Checkout');
-            window.location = globalState.storesData.Shopify.redirectionURL;
+            sendEvent("Click_Brand_Card_Checkout");
+            window.location = globalState.checkoutDetails.web_url;
           }}
         >
           Buy
-          <RightArrowIcon />{' '}
+          <RightArrowIcon />{" "}
         </button>
       </div>
     </div>
   );
 };
 
-const CouponCard = () => {
+const CouponCard = ({ couponName }) => {
   return (
     <div className="flex items-center p-1 rounded-md border-dashed border-[1px] border-[#B7E2CD] mt-2">
       <div className="flex items-center">
         <p className="text-[10px] text-[#0F9F5A] px-2 ">Coupon applied</p>
         <p className="text-[10px] text-[#0F9F5A] px-2 font-semibold border-dashed border-l-[1px] border-[#B7E2CD]">
-          XYZDR
+          {couponName}
         </p>
       </div>
     </div>
   );
 };
 
-const CouponCard1 = () => {
+const CouponCard1 = ({ couponName }) => {
   return (
     <div className=" flex items-center p-1 rounded-md border-dashed border-[1px] border-[#B7E2CD] mt-2">
       <div className="flex items-center">
         <p className="text-[10px] text-[#0F9F5A] px-2 ">Coupon applied</p>
         <p className="text-[10px] text-[#0F9F5A] px-2 font-semibold border-dashed border-l-[1px] border-[#B7E2CD]">
-          XYZDR
+          {couponName}
         </p>
       </div>
     </div>
@@ -138,7 +162,7 @@ const ShippingCard = ({ shipping, shippingIncluded }) => {
             Delivery in {shipping.minDelivery}-{shipping.maxDelivery} days
           </p>
           <p className="text-[8px] lg:text-[10px] text-[#2193C2E5]">
-            {shippingIncluded ? 'Free Shipping' : 'Shipping Extra'}
+            {shippingIncluded ? "Free Shipping" : "Shipping Extra"}
           </p>
         </div>
       </div>

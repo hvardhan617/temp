@@ -7,29 +7,30 @@ import { ProductContext } from "@/context/ProductContext";
 import {
   getBrandData,
   getCampaignData,
+  getCartDetails,
   getProductsData,
 } from "@/helper/apiHelper";
 import { initEventApps } from "@/helper/EventTracker";
 import { getDataLayer, persistCart } from "@/helper/globalDataLayer";
-import { isInViewport } from "@/helper/utilityHelper";
+import { getCouponCode, isInViewport } from "@/helper/utilityHelper";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
 import React, { useContext, useEffect, useState } from "react";
 
-const Prod = ({ productData, campaignData, brandData }) => {
+const Prod = ({ data }) => {
   const router = useRouter();
   const { id } = router.query;
   const { globalState, setGlobalState } = useContext(ProductContext);
   const [extraContent, setExtraContent] = useState(false);
 
   const [hideBottom, setHideBottom] = useState(true);
-
+  let { productData, campaignData, brandData } = data;
   useEffect(() => {
-    let state = getDataLayer({ data: productData, brandData });
-    console.log("globaleState", state);
+    let state = getDataLayer({ productData, brandData, campaignData });
     setExtraContent(true);
     setGlobalState({ ...state });
+    initGlobalState(state);
     if (typeof window !== undefined) {
       initEventApps();
     }
@@ -44,6 +45,28 @@ const Prod = ({ productData, campaignData, brandData }) => {
 
     persistCart(state.cartItems);
   }, []);
+
+  const initGlobalState = async (state) => {
+    console.log("initGlobalState", state);
+    let cartArr = [
+      {
+        variantId: state.selectedVariant._id,
+        quantity: state.cartItems[0].quantity,
+      },
+    ];
+
+    console.log(
+      "getCouponCode(state.campaignData)",
+      getCouponCode(state.campaignData)
+    );
+
+    let checkoutDetails = await getCartDetails(
+      state.campaignData._id,
+      cartArr,
+      getCouponCode(state.campaignData)
+    );
+    setGlobalState({ ...state, checkoutDetails: checkoutDetails.checkout });
+  };
 
   const toggleBottomBar = () => {
     const box = document.querySelector(".storeCard");
@@ -78,7 +101,7 @@ const Prod = ({ productData, campaignData, brandData }) => {
 
           <div className="lg:w-[45vw] lg:max-w-[850px]">
             <ProductInfo details={productData} />
-            {extraContent && (
+            {extraContent && globalState && (
               <ExtraContent featured={globalState.brandData.highlights} />
             )}
           </div>
@@ -95,24 +118,17 @@ export async function getServerSideProps({ query }) {
   try {
     console.log("query1122", JSON.stringify(query));
     const productData = await getProductsData(query.id);
-    console.log("productData", productData);
     const campaignData = await getCampaignData(query.campaign);
-    console.log("campaignData", campaignData);
     const brandData = await getBrandData(campaignData.data.id.brandId);
-    console.log("branddata", brandData);
-    let allData = JSON.stringify();
+    let data = {
+      productData: productData.data,
+      campaignData: { ...campaignData.data, _id: query.campaign },
+      brandData: brandData.data,
+    };
 
-    let stringifyP = JSON.stringify(productData);
-    let stringifyC = JSON.stringify(campaignData);
-    let stringifyB = JSON.stringify(brandData);
-
-    console.log("stringified", stringifyB, stringifyC, stringifyP);
+    console.log("All data ---->", data);
     return {
-      props: {
-        productData: productData.data,
-        campaignData,
-        brandData: brandData.data,
-      },
+      props: { data },
     };
   } catch (error) {
     return {

@@ -45,7 +45,7 @@ const Navbar = ({ brandData, setOpenCart }) => {
               <p className="rounded-full bg-purple-800 text-[8px] text-white px-1 text-center absolute top-0 right-0">
                 {calculateTotalItems(globalState.multiProductCart, true)}
               </p>
-              <img className="" src={cartIcon} />
+              <img className="" src={cartIcon.src} />
             </div>
           )}
         </div>

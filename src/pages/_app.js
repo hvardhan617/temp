@@ -49,7 +49,8 @@ export default function MyApp({ Component, pageProps }) {
     };
   }, [router]);
   const [globalState, setGlobalState] = useState();
-
+  let api_Host = process.env.NEXT_PUBLIC_API_HOST;
+  console.log('api_Host env', api_Host);
   return (
     <ProductContext.Provider value={{ globalState, setGlobalState }}>
       <Component {...pageProps} />
