@@ -5,6 +5,7 @@ import { checkInCart, removeItemsFromCart } from "../../helper/QuantityHelper";
 import { sendEvent } from "../../helper/EventTracker";
 import { persistCart } from "@/helper/globalDataLayer";
 import { getCartDetails } from "@/helper/apiHelper";
+import { getCouponCode } from "@/helper/utilityHelper";
 
 const Quantity = () => {
   const [counter, setCounter] = useState(1);
@@ -59,7 +60,7 @@ const Quantity = () => {
     let checkoutDetails = await getCartDetails(
       globalState.campaignData._id,
       cartArr,
-      ""
+      getCouponCode(globalState.campaignData)
     );
 
     setGlobalState({
@@ -104,7 +105,7 @@ const Quantity = () => {
       let checkoutDetails = await getCartDetails(
         globalState.campaignData._id,
         cartArr,
-        ""
+        getCouponCode(globalState.campaignData)
       );
 
       setGlobalState({
@@ -132,7 +133,8 @@ const Quantity = () => {
     let checkoutDetails = await getCartDetails(
       globalState.campaignData._id,
       cartArr,
-      ""
+      getCouponCode(globalState.campaignData)
+
     );
 
     if (checkoutDetails) {
@@ -209,7 +211,7 @@ const Quantity = () => {
       let checkoutDetails = await getCartDetails(
         globalState.campaignData._id,
         cartArr,
-        ""
+        getCouponCode(globalState.campaignData)
       );
 
       setGlobalState({
@@ -233,7 +235,8 @@ const Quantity = () => {
     let checkoutDetails = await getCartDetails(
       globalState.campaignData._id,
       cartArr,
-      ""
+      getCouponCode(globalState.campaignData)
+
     );
 
     if (checkoutDetails) {

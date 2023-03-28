@@ -7,6 +7,7 @@ import {
 import PropTypes from "prop-types";
 import { persistCart } from "@/helper/globalDataLayer";
 import { getCartDetails } from "@/helper/apiHelper";
+import { getCouponCode } from "@/helper/utilityHelper";
 
 const CartItem = ({ details, quantity }) => {
   const { globalState, setGlobalState } = useContext(ProductContext);
@@ -85,7 +86,7 @@ const CartItem = ({ details, quantity }) => {
     let checkoutDetails = await getCartDetails(
       globalState.campaignData._id,
       cartArr,
-      ""
+      getCouponCode(globalState.campaignData)
     );
 
     setGlobalState({

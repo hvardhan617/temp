@@ -165,6 +165,9 @@ export const getDataLayer = (server) => {
   if (!server) {
     return;
   }
+
+  console.log("serverrData", server);
+
   if (server.multi) {
     data = {
       brand: {
@@ -228,17 +231,17 @@ export const getDataLayer = (server) => {
         // },
       },
       details: {
-        ...server.data,
-        options: cleanOptions(server.data.options),
+        ...server.productData,
+        options: cleanOptions(server.productData.options),
         variants: [
           {
             type: "Colour",
-            details: [...server.data.variants],
+            details: [...server.productData.variants],
           },
         ],
       },
-      selectedVariant: { ...server.data.variants[0] },
-      stores: server.data.stores,
+      selectedVariant: { ...server.productData.variants[0] },
+      stores: server.productData.stores,
     };
   }
 

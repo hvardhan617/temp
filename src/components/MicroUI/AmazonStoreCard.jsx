@@ -14,9 +14,6 @@ const AmazonStoreCard = () => {
     (store) => store.storeId === "amazon.com"
   )[0];
   const amazonDetails = globalState.selectedVariant.amazonDetails;
-  const amazonStore = globalState.productDetails.stores.filter(
-    (store) => store.storeId === "amazon.com"
-  )[0];
 
   const theme = {
     solid: "#2D2D2D",
@@ -67,7 +64,10 @@ const AmazonStoreCard = () => {
           }}
           onClick={() => {
             sendEvent("Amazon Card Checkout");
-            window.location = amazonStore.url;
+            window.location =
+              globalState.campaignData.amazonAttributionLink[
+                globalState.selectedVariant._id
+              ];
           }}
         >
           Buy
@@ -85,7 +85,10 @@ const AmazonStoreCard = () => {
           }}
           onClick={() => {
             sendEvent("Click_Amazon_Card_Checkout");
-            window.location = amazonStore.url;
+            window.location =
+              globalState.campaignData.amazonAttributionLink[
+                globalState.selectedVariant._id
+              ];
           }}
         >
           Buy
@@ -111,7 +114,7 @@ const ShippingCard = ({ amazonDetails }) => {
             <img src={Box.src} className="w-6 h-6" />
           </div>
         )}
-        {amazonDetails.minShippingDays === '0' ? (
+        {amazonDetails.minShippingDays === "0" ? (
           <div className="items-center gap-6 pl-4 lg:flex">
             <p className="text-[10px] font-semibold text-[#2193C2E5]">
               Delivery in {amazonDetails.minShippingDays}-

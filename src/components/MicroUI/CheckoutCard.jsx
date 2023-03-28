@@ -1,12 +1,13 @@
-import { useContext, useEffect, useRef } from 'react';
-import { ProductContext } from '../../context/ProductContext';
-import { getLatestVariantPrices } from '../../dummyBrand';
-import AmazonStoreCard from './AmazonStoreCard';
-import ShopifyStoreCard from './ShopifyStoreCard';
+import { useContext, useEffect, useRef } from "react";
+import { ProductContext } from "../../context/ProductContext";
+import { getLatestVariantPrices } from "../../dummyBrand";
+import AmazonStoreCard from "./AmazonStoreCard";
+import ShopifyStoreCard from "./ShopifyStoreCard";
 
 const CheckoutCard = () => {
   const { globalState, setGlobalState } = useContext(ProductContext);
   const stores = globalState.selectedVariant.pricesFromStores;
+  const participatingStores = globalState.campaignData.participatingStores;
   const store = globalState.stores[0];
   const latestSelectedVariant = useRef(globalState);
 
@@ -20,7 +21,8 @@ const CheckoutCard = () => {
         latestSelectedVariant.current.selectedVariant._id
       );
 
-      latestSelectedVariant.current.selectedVariant.pricesFromStores = variantData.pricesFromStores;
+      latestSelectedVariant.current.selectedVariant.pricesFromStores =
+        variantData.pricesFromStores;
 
       setGlobalState({
         ...latestSelectedVariant.current,
@@ -43,15 +45,21 @@ const CheckoutCard = () => {
         <div className="flex justify-between p-2 px-4 py-3 border-2 border-zinc-900 rounded-xl">
           <div className="flex items-center justify-between w-full gap-2">
             <div className="flex items-center gap-6">
-              <img src={globalState.brandData.logo.url} className="object-contain w-16 h-12" />
+              <img
+                src={globalState.brandData.logo.url}
+                className="object-contain w-16 h-12"
+              />
               <div className="">
-                <p className="font-semibold">{globalState.brandData.registeredName}</p>
+                <p className="font-semibold">
+                  {globalState.brandData.registeredName}
+                </p>
                 <p className="text-[9px] text-zinc-400">{store.url}</p>
               </div>
             </div>
             <div>
               <p className="text-xs text-zinc-400">
-                Delivery in <span className="font-semibold">{store.deliveryDays}</span> days
+                Delivery in{" "}
+                <span className="font-semibold">{store.deliveryDays}</span> days
               </p>
               <p className="text-xs text-zinc-400">Shipping Fee Extra</p>
             </div>
@@ -67,11 +75,17 @@ const CheckoutCard = () => {
 
       <div className="">
         {stores.map((storeData) => {
-          if (storeData.storeId === 'shopify') {
-            return <ShopifyStoreCard key={'shopify'} storeData={storeData} />;
+          if (
+            storeData.storeId === "shopify" &&
+            participatingStores.includes("shopify")
+          ) {
+            return <ShopifyStoreCard key={"shopify"} storeData={storeData} />;
           }
-          if (storeData.storeId === 'amazon.com') {
-            return <AmazonStoreCard key={'amazon.com'} storeData={storeData} />;
+          if (
+            storeData.storeId === "amazon.com" &&
+            participatingStores.includes("amazon.com")
+          ) {
+            return <AmazonStoreCard key={"amazon.com"} storeData={storeData} />;
           }
         })}
       </div>

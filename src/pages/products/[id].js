@@ -12,7 +12,7 @@ import {
 } from "@/helper/apiHelper";
 import { initEventApps } from "@/helper/EventTracker";
 import { getDataLayer, persistCart } from "@/helper/globalDataLayer";
-import { isInViewport } from "@/helper/utilityHelper";
+import { getCouponCode, isInViewport } from "@/helper/utilityHelper";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
@@ -48,11 +48,22 @@ const Prod = ({ data }) => {
 
   const initGlobalState = async (state) => {
     console.log("initGlobalState", state);
+    let cartArr = [
+      {
+        variantId: state.selectedVariant._id,
+        quantity: state.cartItems[0].quantity,
+      },
+    ];
+
+    console.log(
+      "getCouponCode(state.campaignData)",
+      getCouponCode(state.campaignData)
+    );
+
     let checkoutDetails = await getCartDetails(
       state.campaignData._id,
-      state.selectedVariant._id,
-      state.cartItems[0].quantity,
-      ""
+      cartArr,
+      getCouponCode(state.campaignData)
     );
     setGlobalState({ ...state, checkoutDetails: checkoutDetails.checkout });
   };

@@ -1,4 +1,6 @@
 // import React from 'react';
+import { getCartDetails } from "@/helper/apiHelper";
+import { getCouponCode } from "@/helper/utilityHelper";
 import PropTypes from "prop-types";
 import { useContext } from "react";
 import { ProductContext } from "../../context/ProductContext";
@@ -9,10 +11,30 @@ const ProductList = () => {
   const { globalState, setGlobalState } = useContext(ProductContext);
   const list = globalState.productList;
 
-  const handleProducts = (prod) => {
+  const handleProducts = async (prod) => {
     sendEvent("Click_Product_Changed", {});
     let newObj = getProductDetails({ ...globalState }, prod);
     console.log("productChanges", prod, newObj);
+
+    if (newObj.multiProductCart.length === 0) {
+      let cartArr = [
+        {
+          variantId: newObj.selectedVariant._id,
+          quantity: newObj.cartItems[0].quantity,
+        },
+      ];
+
+      let checkoutDetails = await getCartDetails(
+        newObj.campaignData._id,
+        cartArr,
+        getCouponCode(newObj.campaignData)
+      );
+      setGlobalState({
+        ...newObj,
+        checkoutDetails: checkoutDetails ? checkoutDetails.checkout : null,
+      });
+      return
+    }
 
     setGlobalState({ ...newObj });
   };

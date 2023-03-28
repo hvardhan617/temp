@@ -1,5 +1,6 @@
 import { getCartDetails } from "@/helper/apiHelper";
 import { persistCart } from "@/helper/globalDataLayer";
+import { getCouponCode } from "@/helper/utilityHelper";
 import PropTypes from "prop-types";
 import { useContext, useEffect, useState } from "react";
 import { ProductContext } from "../../context/ProductContext";
@@ -15,24 +16,24 @@ const Variants = () => {
   console.log("globalState", globalState);
   console.log("variantOptions", variantOptions);
 
-  useEffect(() => {
-    console.log("variantusss", globalState.productDetails);
+  // useEffect(() => {
+  //   console.log("variantusss", globalState.productDetails);
 
-    let x = { ...globalState.selectedVariant.options };
+  //   let x = { ...globalState.selectedVariant.options };
 
-    Object.keys(x).map((k) => {
-      if (!x[k].label) {
-        x[k] = {
-          label: x[k],
-          enable: true,
-        };
-      }
-    });
+  //   Object.keys(x).map((k) => {
+  //     if (!x[k].label) {
+  //       x[k] = {
+  //         label: x[k],
+  //         enable: true,
+  //       };
+  //     }
+  //   });
 
-    console.log("xxxx", x);
+  //   console.log("xxxx", x);
 
-    setSelectedOption(x);
-  }, []);
+  //   setSelectedOption(x);
+  // }, []);
 
   useEffect(() => {
     console.log("tempVariantsOptions chnaged", tempVariantsOptions);
@@ -107,7 +108,7 @@ const Variants = () => {
       let checkoutDetails = await getCartDetails(
         globalState.campaignData._id,
         cartArr,
-        ""
+        getCouponCode(globalState.campaignData)
       );
 
       state = {
