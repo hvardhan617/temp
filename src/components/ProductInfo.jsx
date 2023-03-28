@@ -55,8 +55,8 @@ const ProductInfo = ({ details }) => {
               {splitLongProductTitle(productDetails.title)[0]}
             </p>
             <Rating
-              count={productDetails.rating.avgRating}
-              ratingCount={productDetails.rating.totalNoOfRating}
+              count={5}
+              ratingCount={100}
             />
           </div>
           <div className="w-[50%] lg:hidden">
