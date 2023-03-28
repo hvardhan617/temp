@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ProductContext } from "../../context/ProductContext";
 import Tag from "./CheckoutComponents/Tag";
 import { calculateFinalCart, getTotal } from "../../helper/QuantityHelper";
@@ -22,7 +22,22 @@ const ShopifyStoreCard = () => {
     ...globalState.theme,
   };
 
-  useEffect(() => {}, [globalState]);
+  const [priceDetails, setPriceDetails] = useState({
+    finalPrice: 0,
+    costPrice: 0,
+    msg: "",
+  });
+
+  useEffect(() => {
+    let totalPrices = getTotal(globalState.cartItems, store);
+    let { finalPrice, msg } = calculateFinalCart(store, totalPrices);
+
+    setPriceDetails({
+      finalPrice,
+      msg,
+      costPrice: totalPrices.totalCostPrice,
+    });
+  }, [globalState]);
 
   return (
     <div className="w-full border-y-[1px] border-zinc-100 flex flex-col justify-between gap-1 pb-4">
@@ -55,26 +70,16 @@ const ShopifyStoreCard = () => {
           <div className="flex items-center justify-end gap-3 storeCard">
             <div className="flex flex-col items-end">
               <p className="text-[14px] font-semibold text-red-500">
-                {
-                  calculateFinalCart(
-                    store,
-                    getTotal(globalState.cartItems, store)
-                  ).msg
-                }
+                {priceDetails.msg}
               </p>
-              <del className="text-[14px] font-normal text-zinc-400 leading-3">
+              {priceDetails.finalPrice !== priceDetails.costPrice && <del className="text-[14px] font-normal text-zinc-400 leading-3">
                 {globalState.currency}
-                {getTotal(globalState.cartItems, store).totalCostPrice}
-              </del>
+                {priceDetails.costPrice}
+              </del>}
             </div>
             <p className="text-3xl font-semibold">
               {globalState.currency}
-              {
-                calculateFinalCart(
-                  store,
-                  getTotal(globalState.cartItems, store)
-                ).finalPrice
-              }
+              {priceDetails.finalPrice}
             </p>
           </div>
         </div>
