@@ -15,9 +15,10 @@ import ReactGA from 'react-ga';
 
 //   return { ...appProps, pageProps: {pixelId } };
 // };
-const cacheControlMiddleware = (res) => {
-
-};
+// const cacheControlMiddleware = (res) => {
+//   // Set cache time to one week (604800 seconds) and mark as immutable
+//   res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+// };
 
 export default function MyApp({ Component, pageProps }) {
   // ReactGA.initialize(pageProps.gaId);
@@ -30,23 +31,23 @@ export default function MyApp({ Component, pageProps }) {
   // //   ReactPixel.init(pageProps.pixelId);
   // // }
   // // ReactPixel.init(pageProps.pixelId);
-  const router = useRouter();
+  // const router = useRouter();
 
-  useEffect(() => {
-    const handleRouteChange = () => {
-      // Apply caching headers to server response
-      const { res } = router;
-      if (res) {
-        cacheControlMiddleware(res);
-      }
-    };
+  // useEffect(() => {
+  //   const handleRouteChange = () => {
+  //     // Apply caching headers to server response
+  //     const { res } = router;
+  //     if (res) {
+  //       cacheControlMiddleware(res);
+  //     }
+  //   };
 
-    router.events.on('routeChangeComplete', handleRouteChange);
+  //   router.events.on('routeChangeComplete', handleRouteChange);
 
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange);
-    };
-  }, [router]);
+  //   return () => {
+  //     router.events.off('routeChangeComplete', handleRouteChange);
+  //   };
+  // }, [router]);
   const [globalState, setGlobalState] = useState();
   let api_Host = process.env.NEXT_PUBLIC_API_HOST;
   console.log('api_Host env', api_Host);

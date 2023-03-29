@@ -16,7 +16,9 @@ import { getCouponCode, isInViewport } from "@/helper/utilityHelper";
 import Head from "next/head";
 
 import { useRouter } from "next/router";
-import React, { useContext, useEffect, useState } from "react";
+
+import Script from "next/script";
+import React, { useContext, useEffect, useState , useLayoutEffect} from "react";
 
 const Prod = ({ data }) => {
   const router = useRouter();
@@ -26,6 +28,10 @@ const Prod = ({ data }) => {
 
   const [hideBottom, setHideBottom] = useState(true);
   let { productData, campaignData, brandData } = data;
+  useLayoutEffect(() => {
+    Pixel();
+    GA();
+  }, []);
   useEffect(() => {
     let state = getDataLayer({ productData, brandData, campaignData });
     setExtraContent(true);
@@ -143,7 +149,7 @@ export async function getServerSideProps({ query }) {
 }
 
 const Pixel = () => {
-  useEffect(() => {
+  if (typeof window !== 'undefined') {
     !(function (f, b, e, v, n, t, s) {
       if (f.fbq) return;
       n = f.fbq = function () {
@@ -169,21 +175,19 @@ const Pixel = () => {
     );
     fbq("init", "590918032795677");
     fbq("track", "PageView");
-  }, []);
-
+  }
   return null;
 };
 
 const GA = () => {
-  useEffect(() => {
+  if (typeof window !== 'undefined') {
     window.dataLayer = window.dataLayer || [];
     function gtag() {
       dataLayer.push(arguments);
     }
     gtag("js", new Date());
 
-    gtag("config", "G-YZ3X85LCKZ");
-  }, []);
-
+    gtag("config", "G-PDVX1QFG0G");
+  }
   return null;
 };
