@@ -183,7 +183,7 @@ const Quantity = () => {
   const decreaseQuantity = async () => {
     sendEvent("Click_Decrease_Quantity");
 
-    let cartItems;
+    let cartItems = globalState.cartItems;
 
     if (globalState.multiProductCart.length > 0) {
       cartItems = globalState.multiProductCart;
@@ -194,24 +194,19 @@ const Quantity = () => {
       globalState.selectedVariant._id
     );
 
-    if (updatedCart.length > 0) {
-      let checkoutDetails;
+    if (globalState.multi && updatedCart.length > 0) {
+      let cartArr = updatedCart.map((item) => {
+        return {
+          variantId: item._id,
+          quantity: item.quantity,
+        };
+      });
 
-      if (updatedCart.length > 0) {
-        let cartArr = updatedCart.map((item) => {
-          return {
-            variantId: item._id,
-            quantity: item.quantity,
-          };
-        });
-
-        checkoutDetails = await getCartDetails(
-          globalState.campaignData._id,
-          cartArr,
-          getCouponCode(globalState.campaignData)
-        );
-      } else {
-      }
+      let checkoutDetails = await getCartDetails(
+        globalState.campaignData._id,
+        cartArr,
+        getCouponCode(globalState.campaignData)
+      );
 
       setGlobalState({
         ...globalState,
@@ -223,7 +218,11 @@ const Quantity = () => {
 
       return;
     } else {
-      updatedCart = globalState.cartItems;
+      updatedCart = removeItemsFromCart(
+        globalState.cartItems,
+        globalState.selectedVariant._id
+      );
+
       console.log("updatedCart", updatedCart, cartItems);
     }
 
@@ -245,13 +244,13 @@ const Quantity = () => {
         ...globalState,
         cartItems: updatedCart,
         productAddedToCart: false,
-        multiProductCart:[],
+        multiProductCart: [],
         checkoutDetails: checkoutDetails.checkout,
       });
     } else {
       setGlobalState({
         ...globalState,
-        multiProductCart:[],
+        multiProductCart: [],
         productAddedToCart: false,
         cartItems: updatedCart,
       });

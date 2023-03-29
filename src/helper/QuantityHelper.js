@@ -70,7 +70,9 @@ export const calculateTotalItems = (items, nav = false) => {
 export const calculatePercentage = (sellingPrice, slashPrice) => {
   let discount = Math.round(100 - (sellingPrice / slashPrice) * 100);
 
+  console.log('discount', discount);
   let dicountTxt = discount > 0 ? `${discount}% OFF` : null;
+
 
   return dicountTxt;
 };

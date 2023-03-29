@@ -47,7 +47,7 @@ const ShopifyStoreCard = () => {
       costPrice: totalPrices.totalCostPrice,
     });
   }, [globalState]);
-  
+
   if (checkoutDetails) {
     return (
       <div className="w-full border-y-[1px] border-zinc-100 flex flex-col justify-between gap-1 pb-4">
@@ -87,8 +87,10 @@ const ShopifyStoreCard = () => {
                     priceDetails.slashedPrice
                   )}
                 </p>
-                {checkoutDetails.total_price !==
-                  priceDetails.slashedPrice && (
+                {calculatePercentage(
+                  checkoutDetails.total_price,
+                  priceDetails.slashedPrice
+                ) !== 0 && (
                   <del className="text-[14px] font-normal text-zinc-400 leading-3">
                     {globalState.currency}
                     {priceDetails.slashedPrice}
