@@ -11,7 +11,7 @@ import { initEventApps } from "@/helper/EventTracker";
 import { getDataLayer } from "@/helper/globalDataLayer";
 import { getCouponCode, isInViewport } from "@/helper/utilityHelper";
 import Head from "next/head";
-
+import redis from '../../redis';
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 
@@ -127,21 +127,18 @@ const Collection = ({ productData, campaignData, brandData }) => {
             <>
               <BottomBar setOpenCart={setOpenCart} />
               <div
-                className={`ease-in-out absolute w-full bg-black bg-opacity-70 top-0 z-30 ${
-                  openCart ? "visible" : "invisible"
-                }`}
+                className={`ease-in-out absolute w-full bg-black bg-opacity-70 top-0 z-30 ${openCart ? "visible" : "invisible"
+                  }`}
               >
                 <div
-                  className={`lg:hidden w-full ease-in-out fixed bottom-0 ${
-                    openCart ? "translate-y-0" : "translate-y-full"
-                  }`}
+                  className={`lg:hidden w-full ease-in-out fixed bottom-0 ${openCart ? "translate-y-0" : "translate-y-full"
+                    }`}
                 >
                   <Cart setOpenCart={setOpenCart} />
                 </div>
                 <div
-                  className={`hidden lg:flex ease-in-out fixed bottom-0 lg:right-0 lg:top-0 ${
-                    openCart ? "translate-x-0" : "translate-x-full"
-                  }`}
+                  className={`hidden lg:flex ease-in-out fixed bottom-0 lg:right-0 lg:top-0 ${openCart ? "translate-x-0" : "translate-x-full"
+                    }`}
                 >
                   <Cart setOpenCart={setOpenCart} />
                 </div>
@@ -159,12 +156,33 @@ export default Collection;
 export async function getServerSideProps({ query }) {
   console.log("query1122", JSON.stringify(query));
 
+  // Check if the requested page exists in Redis cache
+  const cachedPage = await redis.get(`page:${query}`);
+  if (cachedPage) {
+    console.log(":::::CACHED PAGE:::::")
+    return {
+      props: {
+        data: JSON.parse(cachedPage)
+      }
+    };
+  }
+
+  // If the requested page does not exist in cache, fetch it from the origin server
   const productData = await getCollectionData(query.id);
   console.log("productData", productData);
   const campaignData = await getCampaignData(query.campaign);
   console.log("campaignData", campaignData);
   const brandData = await getBrandData(campaignData.data.id.brandId);
   console.log("branddata", brandData);
+
+  let data = {
+    productData: productData.data,
+    campaignData: { ...campaignData.data, _id: query.campaign },
+    brandData: brandData.data,
+  }
+  // Store the fetched page in Redis cache
+  console.log("::::Setting page data into redis:::::")
+  await redis.set(`page:${query}`, JSON.stringify(data), 'EX', 60 * 5); // set expiry time to 5 minutes
 
   let stringifyP = JSON.stringify(productData);
   let stringifyC = JSON.stringify(campaignData);
@@ -173,11 +191,7 @@ export async function getServerSideProps({ query }) {
   console.log("stringified", stringifyB, stringifyC, stringifyP);
 
   return {
-    props: {
-      productData: productData.data,
-      campaignData: { ...campaignData.data, _id: query.campaign },
-      brandData: brandData.data,
-    },
+    props: { data },
   };
 }
 
