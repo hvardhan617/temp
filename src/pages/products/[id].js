@@ -16,7 +16,8 @@ import { getCouponCode, isInViewport } from "@/helper/utilityHelper";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
-import React, { useContext, useEffect, useState , useLayoutEffect} from "react";
+import redis from '../../redis';
+import React, { useContext, useEffect, useState, useLayoutEffect } from "react";
 
 const Prod = ({ data }) => {
   const router = useRouter();
@@ -26,10 +27,7 @@ const Prod = ({ data }) => {
 
   const [hideBottom, setHideBottom] = useState(true);
   let { productData, campaignData, brandData } = data;
-  useLayoutEffect(() => {
-    Pixel();
-    GA();
-  }, []);
+
   useEffect(() => {
     let state = getDataLayer({ productData, brandData, campaignData });
     setExtraContent(true);
@@ -119,25 +117,44 @@ const Prod = ({ data }) => {
 export default Prod;
 
 export async function getServerSideProps({ query }) {
+
+  console.log("query1122", JSON.stringify(query));
+
   try {
-    console.log("query1122", JSON.stringify(query));
+    // Check if the requested page exists in Redis cache
+    const cachedPage = await redis.get(`page:${query}`);
+    if (cachedPage) {
+      console.log(":::::CACHED PAGE:::::")
+      return {
+        props: {
+          data: JSON.parse(cachedPage)
+        }
+      };
+    }
+
+    // If the requested page does not exist in cache, fetch it from the origin server
     const productData = await getProductsData(query.id);
     const campaignData = await getCampaignData(query.campaign);
     const brandData = await getBrandData(campaignData.data.id.brandId);
 
-    console.log("response data",campaignData.data.id.brandId );
-    
+    console.log("response data", campaignData.data.id.brandId);
+
     let data = {
       productData: productData.data,
       campaignData: { ...campaignData.data, _id: query.campaign },
       brandData: brandData.data,
     };
 
+    // Store the fetched page in Redis cache
+    console.log("::::Setting page data into redis:::::")
+    await redis.set(`page:${query}`, JSON.stringify(data), 'EX', 60 * 5); // set expiry time to 5 minutes
+
     console.log("All data ---->", data);
     return {
       props: { data },
     };
   } catch (error) {
+    console.log(":::ERRRR:::" + error)
     return {
       props: {
         error,
@@ -147,7 +164,7 @@ export async function getServerSideProps({ query }) {
 }
 
 const Pixel = () => {
-  if (typeof window !== 'undefined') {
+  useEffect(() => {
     !(function (f, b, e, v, n, t, s) {
       if (f.fbq) return;
       n = f.fbq = function () {
@@ -173,12 +190,12 @@ const Pixel = () => {
     );
     fbq("init", "590918032795677");
     fbq("track", "PageView");
-  }
+  }, []);
   return null;
 };
 
 const GA = () => {
-  if (typeof window !== 'undefined') {
+  useEffect(() => {
     window.dataLayer = window.dataLayer || [];
     function gtag() {
       dataLayer.push(arguments);
@@ -186,6 +203,6 @@ const GA = () => {
     gtag("js", new Date());
 
     gtag("config", "G-PDVX1QFG0G");
-  }
+  }, []);
   return null;
 };
