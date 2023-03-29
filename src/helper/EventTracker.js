@@ -2,21 +2,27 @@
 
 import mixpanel from "mixpanel-browser";
 // import ReactPixel from 'react-facebook-pixel';
-// import ReactGA from 'react-ga';
+import ReactGA from "react-ga";
 
 const sendMixPanelEvent = (eventName, extras) => {
   mixpanel.track(eventName, extras);
+  console.log('mixpanel.get_distinct_id()', mixpanel.get_distinct_id(),);
 };
 
 export const initEventApps = () => {
   mixpanel.init("912d68a7f947fbc07f7a883043c61079", { debug: true });
   //   ReactPixel.init('590918032795677');
-  //   ReactGA.initialize('G-YZ3X85LCKZ');
+  ReactGA.initialize("G-5STMS50L5E");
 };
 
 export const sendEvent = (eventName, extras = {}) => {
   sendMixPanelEvent(eventName, extras);
   //   sendPixelEvent(eventName);
+
+  ReactGA.event({
+    category: "logo",
+    action: "click",
+  });
 };
 
 const sendPixelEvent = (eventName) => {
@@ -48,3 +54,30 @@ const sendPixelEvent = (eventName) => {
   ) {
   }
 };
+
+// export const initGA = () => {
+//   ReactGA.initialize('GA_TRACKING_ID');
+// };
+
+// export const logPageView = () => {
+//   ReactGA.set({ page: window.location.pathname });
+//   ReactGA.pageview(window.location.pathname);
+// };
+
+// export const logEvent = (category = '', action = '') => {
+//   if (category && action) {
+//     ReactGA.event({
+//       category,
+//       action,
+//     });
+//   }
+// };
+
+// export const logException = (description = '', fatal = false) => {
+//   if (description) {
+//     ReactGA.exception({
+//       description,
+//       fatal,
+//     });
+//   }
+// };

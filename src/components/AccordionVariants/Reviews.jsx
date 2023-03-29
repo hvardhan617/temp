@@ -33,7 +33,7 @@ const Reviews = () => {
 
   const handleReviewsData = async () => {
     let reviewsData = await getReviewsData(globalState.productDetails._id);
-
+    console.log('ssss', reviewsData);
     setReviews(reviewsData.data);
 
     if (reviewsData.data.length > 3) {
@@ -65,14 +65,14 @@ const Reviews = () => {
 
   if (!reviews) {
     return (
-      <div className="py-3 flex justify-center">
-        <Spinner className="animate-spin h-4 w-4" />
+      <div className="flex justify-center py-3">
+        <Spinner className="w-4 h-4 animate-spin" />
       </div>
     );
   }
 
   if (reviews.length === 0) {
-    return <div className="py-3 flex justify-center text-sm">No Reviews Found</div>;
+    return <div className="flex justify-center py-3 text-sm">No Reviews Found</div>;
   }
 
   return (
@@ -82,14 +82,14 @@ const Reviews = () => {
           return (
             <img
               src={url}
-              className="w-20 h-20 rounded-lg object-contain"
+              className="object-contain w-20 h-20 rounded-lg"
               key={i}
               onClick={() => setShowAllImages(true)}
             />
           );
         })}
       </div>
-      {/* <div className="text-sm text-zinc-400 my-3">
+      {/* <div className="my-3 text-sm text-zinc-400">
         <span className="font-semibold">{allImages.length}</span> images uploaded by customers
       </div> */}
       <div className="flex flex-col gap-4 py-1">
@@ -102,7 +102,7 @@ const Reviews = () => {
             })}
         {reviews.length > 3 && (
           <button
-            className="border-2 border-zinc-400 w-full p-4 rounded-lg cursor-pointer"
+            className="w-full p-4 border-2 rounded-lg cursor-pointer border-zinc-400"
             onClick={() => {
               setHideContent(!hideContent);
               sendEvent(hideContent ? 'Click_Reviews_Less' : 'Click_Reviews_More');

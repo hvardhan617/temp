@@ -88,6 +88,7 @@ const BottomBar = ({ setOpenCart }) => {
     }
   };
 
+
   return (
     <div className="w-full bg-white fixed bottom-0 shadow-2xl shadow-zinc-700 border-t-[1px] border-zinc-100 flex justify-center z-20">
       <div
@@ -98,8 +99,8 @@ const BottomBar = ({ setOpenCart }) => {
         <div className="hidden lg:flex items-center justify-between lg:w-[32vw] lg:max-w-[768px] xl:w-[36vw] xl:max-w-[768px]">
           <div className="px-4">
             <p className="text-xs">Cart Summary</p>
-            <p className="text-xs font-semibold mt-2">
-              {calculateTotalItems(globalState.cartItems)} total
+            <p className="mt-2 text-xs font-semibold">
+              { globalState.multiProductCart.length > 0 ? calculateTotalItems(globalState.multiProductCart) : calculateTotalItems(globalState.cartItems)} total
             </p>
           </div>
           <div className={`${additionalSaving > 0 ? 'visible' : 'invisible'}`}>

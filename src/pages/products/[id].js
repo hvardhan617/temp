@@ -7,27 +7,30 @@ import { ProductContext } from "@/context/ProductContext";
 import {
   getBrandData,
   getCampaignData,
+  getCartDetails,
   getProductsData,
 } from "@/helper/apiHelper";
 import { initEventApps } from "@/helper/EventTracker";
-import { getDataLayer } from "@/helper/globalDataLayer";
-import { isInViewport } from "@/helper/utilityHelper";
+import { getDataLayer, persistCart } from "@/helper/globalDataLayer";
+import { getCouponCode, isInViewport } from "@/helper/utilityHelper";
+import Head from "next/head";
+
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 
-const Prod = ({ productData, campaignData, brandData }) => {
+const Prod = ({ data }) => {
   const router = useRouter();
   const { id } = router.query;
   const { globalState, setGlobalState } = useContext(ProductContext);
   const [extraContent, setExtraContent] = useState(false);
 
   const [hideBottom, setHideBottom] = useState(true);
-
+  let { productData, campaignData, brandData } = data;
   useEffect(() => {
-    let state = getDataLayer({ data: productData, brandData });
-    console.log("globaleState", state);
+    let state = getDataLayer({ productData, brandData, campaignData });
     setExtraContent(true);
     setGlobalState({ ...state });
+    initGlobalState(state);
     if (typeof window !== undefined) {
       initEventApps();
     }
@@ -39,7 +42,31 @@ const Prod = ({ productData, campaignData, brandData }) => {
     document.addEventListener("scroll", toggleBottomBar, {
       passive: true,
     });
+
+    persistCart(state.cartItems);
   }, []);
+
+  const initGlobalState = async (state) => {
+    console.log("initGlobalState", state);
+    let cartArr = [
+      {
+        variantId: state.selectedVariant._id,
+        quantity: state.cartItems[0].quantity,
+      },
+    ];
+
+    console.log(
+      "getCouponCode(state.campaignData)",
+      getCouponCode(state.campaignData)
+    );
+
+    let checkoutDetails = await getCartDetails(
+      state.campaignData._id,
+      cartArr,
+      getCouponCode(state.campaignData)
+    );
+    setGlobalState({ ...state, checkoutDetails: checkoutDetails.checkout });
+  };
 
   const toggleBottomBar = () => {
     const box = document.querySelector(".storeCard");
@@ -52,7 +79,7 @@ const Prod = ({ productData, campaignData, brandData }) => {
         <Navbar brandData={brandData} />
       </div>
       <Pixel />
-      <GA/>
+      <GA />
       <div className="flex justify-center w-full ">
         <div className="flex flex-col lg:items-start lg:justify-between lg:flex-row lg:w-[90vw] lg:max-w-[1800px]">
           <div className="lg:w-[32vw] lg:max-w-[768px] xl:w-[36vw] xl:max-w-[768px]">
@@ -74,7 +101,7 @@ const Prod = ({ productData, campaignData, brandData }) => {
 
           <div className="lg:w-[45vw] lg:max-w-[850px]">
             <ProductInfo details={productData} />
-            {extraContent && (
+            {extraContent && globalState && (
               <ExtraContent featured={globalState.brandData.highlights} />
             )}
           </div>
@@ -90,19 +117,21 @@ export default Prod;
 export async function getServerSideProps({ query }) {
   try {
     console.log("query1122", JSON.stringify(query));
-
     const productData = await getProductsData(query.id);
-    console.log("productData", productData);
     const campaignData = await getCampaignData(query.campaign);
-    console.log("campaignData", campaignData);
     const brandData = await getBrandData(campaignData.data.id.brandId);
-    console.log("branddata", brandData);
+
+    console.log("response data",campaignData.data.id.brandId );
+    
+    let data = {
+      productData: productData.data,
+      campaignData: { ...campaignData.data, _id: query.campaign },
+      brandData: brandData.data,
+    };
+
+    console.log("All data ---->", data);
     return {
-      props: {
-        productData: productData.data,
-        campaignData,
-        brandData: brandData.data,
-      },
+      props: { data },
     };
   } catch (error) {
     return {

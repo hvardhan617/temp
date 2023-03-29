@@ -165,7 +165,10 @@ export const getDataLayer = (server) => {
   if (!server) {
     return;
   }
-  if (false) {
+
+  console.log("serverrData", server);
+
+  if (server.multi) {
     data = {
       brand: {
         logo: "https://cdn.shopify.com/s/files/1/0057/8938/4802/files/boat_logo_small.webp?v=1672379935",
@@ -196,10 +199,13 @@ export const getDataLayer = (server) => {
             details: [...server.data.products[0].variants],
           },
         ],
+
+        options: cleanOptions(server.data.products[0].options),
       },
       selectedVariant: { ...server.data.products[0].variants[0] },
       productList: getProductDetailsObj(server.data.products),
       stores: server.data.stores,
+      collectionName: server.data.name,
     };
   } else {
     data = {
@@ -225,49 +231,63 @@ export const getDataLayer = (server) => {
         // },
       },
       details: {
-        ...server.data,
-        options: cleanOptions(server.data.options),
+        ...server.productData,
+        options: cleanOptions(server.productData.options),
         variants: [
           {
             type: "Colour",
-            details: [...server.data.variants],
+            details: [...server.productData.variants],
           },
         ],
       },
-      selectedVariant: { ...server.data.variants[0] },
-      stores: server.data.stores,
+      selectedVariant: { ...server.productData.variants[0] },
+      stores: server.productData.stores,
     };
   }
 
   return {
     store: "Brand",
     multi: server.multi,
-    currency: getCurrency("USD"),
+    currency: getCurrency(server.brandData.currency),
     theme: { ...data.brand.theme },
     productAddedToCart: false,
-    cartItems: [
-      {
-        ...data.details.variants[0].details[0],
-        quantity: 1,
-        thumbnail:
-          "https://ik.manmatters.com/media/misc/pdp_rcl/26166797/4_-Redensyl-Oil-_600X600_-with-ingredients_xs66fiKuT.png?tr=w-600",
-      },
-    ],
-    multiProductCart: [],
+    campaignData: server.campaignData,
+    cartItems: server.multi
+      ? [
+          {
+            ...data.details.variants[0].details[0],
+            quantity: 1,
+            thumbnail:
+              "https://ik.manmatters.com/media/misc/pdp_rcl/26166797/4_-Redensyl-Oil-_600X600_-with-ingredients_xs66fiKuT.png?tr=w-600",
+          },
+        ]
+      : getCart() ?? [
+          {
+            ...data.details.variants[0].details[0],
+            quantity: 1,
+            thumbnail:
+              "https://ik.manmatters.com/media/misc/pdp_rcl/26166797/4_-Redensyl-Oil-_600X600_-with-ingredients_xs66fiKuT.png?tr=w-600",
+          },
+        ],
+
+    multiProductCart: server.multi ? getCart() ?? [] : [],
     productList: data.productList ? [...data.productList] : undefined,
     selectedStore: "Shopify",
     stores: data.stores,
     storesData: { ...data.details.variants[0].details[0].storesPrices },
-    selectedVariant: { ...data.selectedVariant },
+    selectedVariant: server.multi
+      ? { ...data.selectedVariant }
+      : getDefaultVariant({ ...data.selectedVariant }),
     variants: { ...data.details.variants[0] },
     productDetails: data.details,
     brandData: server.brandData,
+    collectionName: data.collectionName,
     variantDetails: data.details.variants,
     finalCart: {},
   };
 };
 
-const getProductDetailsObj = () => {
+const getProductDetailsObj = (data) => {
   let products = data.map((prod) => {
     return {
       ...prod,
@@ -288,12 +308,14 @@ const getProductDetailsObj = () => {
 export const getProductDetails = (globalState, prod) => {
   return {
     ...globalState,
-    selectedProduct: prod,
+    selectedProduct: { ...prod, options: cleanOptions(prod.options) },
     storesData: { ...prod.variants[0].details[0].storesPrices },
     selectedVariant: { ...prod.variants[0].details[0] },
-    variants: { ...prod.variants[0] },
+    variants: { type: "Colour", details: prod.variants[0].details },
+    variantDetails: [{ type: "Colour", details: prod.variants[0].details }],
     productDetails: {
       ...prod,
+      options: cleanOptions(prod.options),
     },
 
     cartItems: [
@@ -327,4 +349,29 @@ const cleanOptions = (options) => {
   console.log("cleanOptions", newOptions);
 
   return newOptions;
+};
+
+export const persistCart = (cart) => {
+  sessionStorage.setItem("cart", JSON.stringify(cart));
+};
+
+export const getCart = () => {
+  try {
+    let cart = sessionStorage.getItem("cart");
+    if (cart) {
+      return JSON.parse(cart);
+    }
+    return undefined;
+  } catch (error) {
+    return [];
+  }
+};
+
+const getDefaultVariant = (variant) => {
+  const cart = getCart();
+  if (cart) {
+    return cart[0];
+  }
+
+  return variant;
 };

@@ -1,17 +1,18 @@
-import { useContext, useEffect, useRef } from 'react';
-import { ProductContext } from '../../context/ProductContext';
-import { getLatestVariantPrices } from '../../dummyBrand';
-import AmazonStoreCard from './AmazonStoreCard';
-import ShopifyStoreCard from './ShopifyStoreCard';
+import { useContext, useEffect, useRef } from "react";
+import { ProductContext } from "../../context/ProductContext";
+import { getLatestVariantPrices } from "../../dummyBrand";
+import AmazonStoreCard from "./AmazonStoreCard";
+import ShopifyStoreCard from "./ShopifyStoreCard";
 
 const CheckoutCard = () => {
   const { globalState, setGlobalState } = useContext(ProductContext);
   const stores = globalState.selectedVariant.pricesFromStores;
+  const participatingStores = globalState.campaignData.participatingStores;
   const store = globalState.stores[0];
   const latestSelectedVariant = useRef(globalState);
 
   useEffect(() => {
-    getLatestPricing();
+    // getLatestPricing();
   }, []);
 
   const getLatestPricing = () => {
@@ -20,7 +21,8 @@ const CheckoutCard = () => {
         latestSelectedVariant.current.selectedVariant._id
       );
 
-      latestSelectedVariant.current.selectedVariant.pricesFromStores = variantData.pricesFromStores;
+      latestSelectedVariant.current.selectedVariant.pricesFromStores =
+        variantData.pricesFromStores;
 
       setGlobalState({
         ...latestSelectedVariant.current,
@@ -39,21 +41,27 @@ const CheckoutCard = () => {
   if (globalState.multiProductCart.length > 0) {
     return (
       <div className="w-full px-6">
-        <p className="font-semibold mb-4">Selected Store</p>
-        <div className="flex justify-between p-2 py-3 px-4 border-2 border-zinc-900 rounded-xl">
-          <div className="flex w-full gap-2 justify-between items-center">
-            <div className="flex gap-6 items-center">
-              <img src={globalState.brandData.logo.url} className="w-16 h-12 object-contain" />
+        <p className="mb-4 font-semibold">Selected Store</p>
+        <div className="flex justify-between p-2 px-4 py-3 border-2 border-zinc-900 rounded-xl">
+          <div className="flex items-center justify-between w-full gap-2">
+            <div className="flex items-center gap-6">
+              <img
+                src={globalState.brandData.logo.url}
+                className="object-contain w-16 h-12"
+              />
               <div className="">
-                <p className="font-semibold">{globalState.brandData.registeredName}</p>
-                <p className="text-[9px] text-zinc-400">{store.url}</p>
+                <p className="font-semibold">
+                  {globalState.brandData.brandName}
+                </p>
+                <p className="text-[9px] text-zinc-400">{globalState.brandData.domain}</p>
               </div>
             </div>
             <div>
-              <p className="text-zinc-400 text-xs">
-                Delivery in <span className="font-semibold">{store.deliveryDays}</span> days
+              <p className="text-xs text-zinc-400">
+                Delivery in{" "}
+                <span className="font-semibold">{store.deliveryDays}</span> days
               </p>
-              <p className="text-zinc-400 text-xs">Shipping Fee Extra</p>
+              <p className="text-xs text-zinc-400">Shipping Fee Extra</p>
             </div>
           </div>
         </div>
@@ -67,11 +75,17 @@ const CheckoutCard = () => {
 
       <div className="">
         {stores.map((storeData) => {
-          if (storeData.storeId === 'shopify') {
-            return <ShopifyStoreCard key={'shopify'} storeData={storeData} />;
+          if (
+            storeData.storeId === "shopify" &&
+            participatingStores.includes("shopify")
+          ) {
+            return <ShopifyStoreCard key={"shopify"} storeData={storeData} />;
           }
-          if (storeData.storeId === 'amazon.com') {
-            return <AmazonStoreCard key={'amazon.com'} storeData={storeData} />;
+          if (
+            storeData.storeId === "amazon.com" &&
+            participatingStores.includes("amazon.com")
+          ) {
+            return <AmazonStoreCard key={"amazon.com"} storeData={storeData} />;
           }
         })}
       </div>

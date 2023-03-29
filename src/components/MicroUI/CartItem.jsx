@@ -1,7 +1,13 @@
-import { useContext, useEffect, useState } from 'react';
-import { ProductContext } from '../../context/ProductContext';
-import { getTotalMultiProduct, removeItemsFromCart } from '../../helper/QuantityHelper';
-import PropTypes from 'prop-types';
+import { useContext, useEffect, useState } from "react";
+import { ProductContext } from "../../context/ProductContext";
+import {
+  getTotalMultiProduct,
+  removeItemsFromCart,
+} from "../../helper/QuantityHelper";
+import PropTypes from "prop-types";
+import { persistCart } from "@/helper/globalDataLayer";
+import { getCartDetails } from "@/helper/apiHelper";
+import { getCouponCode } from "@/helper/utilityHelper";
 
 const CartItem = ({ details, quantity }) => {
   const { globalState, setGlobalState } = useContext(ProductContext);
@@ -30,7 +36,7 @@ const CartItem = ({ details, quantity }) => {
   const increaseQuantity = (id) => {
     let cartItems = globalState.multiProductCart;
 
-    cartItems.forEach((item, i) => {
+    cartItems.forEach(async (item, i) => {
       if (item._id === id) {
         let tempItems = [...cartItems];
 
@@ -39,24 +45,57 @@ const CartItem = ({ details, quantity }) => {
           quantity: cartItems[i].quantity + 1,
         };
 
+        let cartArr = tempItems.map((item) => {
+          return {
+            variantId: item._id,
+            quantity: item.quantity,
+          };
+        });
+
+        let checkoutDetails = await getCartDetails(
+          globalState.campaignData._id,
+          cartArr,
+          ""
+        );
+
         setGlobalState({
           ...globalState,
           multiProductCart: tempItems,
+          checkoutDetails: checkoutDetails ? checkoutDetails.checkout : null,
         });
+
+        persistCart(tempItems);
       }
     });
     findMultiVariants();
   };
 
-  const decreaseQuantity = (id) => {
+  const decreaseQuantity = async (id) => {
     let cartItems = globalState.multiProductCart;
 
     let updatedCart = removeItemsFromCart(cartItems, id);
-    console.log('updatedCart', id, updatedCart);
+    console.log("updatedCart", id, updatedCart);
+
+    let cartArr = updatedCart.map((item) => {
+      return {
+        variantId: item._id,
+        quantity: item.quantity,
+      };
+    });
+
+    let checkoutDetails = await getCartDetails(
+      globalState.campaignData._id,
+      cartArr,
+      getCouponCode(globalState.campaignData)
+    );
+
     setGlobalState({
       ...globalState,
       multiProductCart: updatedCart,
+      checkoutDetails: checkoutDetails ? checkoutDetails.checkout : null,
     });
+
+    persistCart(updatedCart);
 
     findMultiVariants();
   };
@@ -65,10 +104,15 @@ const CartItem = ({ details, quantity }) => {
     return (
       <div className="flex flex-col p-4 px-6 justify-between gap-4 border-b-[1px] border-zinc-100">
         <div className="flex justify-between gap-4">
-          <img src={globalState.productDetails.media[0].url} className="w-14 h-14 rounded-md" />
+          <img
+            src={globalState.productDetails.media[0].url}
+            className="rounded-md w-14 h-14"
+          />
           <div className="w-[40%] flex flex-col gap-1">
-            <p className="text-xs overflow-hidden h-12">{details.title}</p>
-            <p className="text-xs text-zinc-400">{multiVariants.length} variants in cart</p>
+            <p className="h-12 overflow-hidden text-xs">{details.title}</p>
+            <p className="text-xs text-zinc-400">
+              {multiVariants.length} variants in cart
+            </p>
           </div>
           <div className="w-[35%] text-right flex flex-col justify-start">
             <p className="text-lg font-semibold">
@@ -85,7 +129,9 @@ const CartItem = ({ details, quantity }) => {
             >
               <div className="w-[40%] flex flex-col gap-1">
                 <p className="text-xs text-zinc-400">Size: {vdetails.title}</p>
-                <p className="text-xs text-zinc-400">Quantity: {vdetails.quantity}</p>
+                <p className="text-xs text-zinc-400">
+                  Quantity: {vdetails.quantity}
+                </p>
               </div>
               <div className="w-[35%] text-right flex flex-col justify-start">
                 <p className="text-lg font-semibold">
@@ -99,24 +145,28 @@ const CartItem = ({ details, quantity }) => {
                     {vdetails.price.marketPrice * vdetails.quantity}
                   </del>
                 </p>
-                <div className="flex justify-end items-end text-xs mt-2">
-                  <div className="bg-zinc-200 flex items-center">
+                <div className="flex items-end justify-end mt-2 text-xs">
+                  <div className="flex items-center bg-zinc-200">
                     <button
                       className={`bg-zinc-800 rounded-lg w-6 h-6 text-white ${
-                        quantity === 1 ? 'pointer-events-none' : 'pointer-events-auto' //not handled empty cart
+                        quantity === 1
+                          ? "pointer-events-none"
+                          : "pointer-events-auto" //not handled empty cart
                       }`}
                       onClick={() => decreaseQuantity(vdetails._id)}
                     >
-                      {' '}
-                      -{' '}
+                      {" "}
+                      -{" "}
                     </button>
-                    <p className="bg-zinc-200 w-8 text-center rounded-sm">{vdetails.quantity}</p>
+                    <p className="w-8 text-center rounded-sm bg-zinc-200">
+                      {vdetails.quantity}
+                    </p>
                     <button
                       className={`bg-zinc-800 rounded-lg w-6 h-6 text-white`}
                       onClick={() => increaseQuantity(vdetails._id)}
                     >
-                      {' '}
-                      +{' '}
+                      {" "}
+                      +{" "}
                     </button>
                   </div>
                 </div>
@@ -130,9 +180,12 @@ const CartItem = ({ details, quantity }) => {
 
   return (
     <div className="flex p-4 px-6 justify-between gap-4 border-b-[1px] border-zinc-100 pb-4">
-      <img src={globalState.productDetails.media[0].url} className="w-14 h-14 rounded-md" />
+      <img
+        src={globalState.productDetails.media[0].url}
+        className="rounded-md w-14 h-14"
+      />
       <div className="w-[40%] flex flex-col gap-1">
-        <p className="text-xs overflow-hidden h-12">{details.title}</p>
+        <p className="h-12 overflow-hidden text-xs">{details.title}</p>
         <p className="text-xs text-zinc-400">{details.label}</p>
       </div>
       <div className="w-[35%] text-right flex flex-col justify-start">
@@ -147,24 +200,26 @@ const CartItem = ({ details, quantity }) => {
             {details.price.marketPrice * details.quantity}
           </del>
         </p>
-        <div className="flex justify-end items-end text-xs mt-2">
-          <div className="bg-zinc-200 flex items-center">
+        <div className="flex items-end justify-end mt-2 text-xs">
+          <div className="flex items-center bg-zinc-200">
             <button
               className={`bg-zinc-800 rounded-lg w-6 h-6 text-white ${
-                quantity === 1 ? 'pointer-events-none' : 'pointer-events-auto' //not handled empty cart
+                quantity === 1 ? "pointer-events-none" : "pointer-events-auto" //not handled empty cart
               }`}
               onClick={() => decreaseQuantity(details._id)}
             >
-              {' '}
-              -{' '}
+              {" "}
+              -{" "}
             </button>
-            <p className="bg-zinc-200 w-8 text-center rounded-sm">{details.quantity}</p>
+            <p className="w-8 text-center rounded-sm bg-zinc-200">
+              {details.quantity}
+            </p>
             <button
               className={`bg-zinc-800 rounded-lg w-6 h-6 text-white`}
               onClick={() => increaseQuantity(details._id)}
             >
-              {' '}
-              +{' '}
+              {" "}
+              +{" "}
             </button>
           </div>
         </div>
