@@ -34,7 +34,7 @@ const ShopifyCheckout = ({ priceDetails, setOpen }) => {
     );
   }
 
-  if (activeMultiCart) {
+  if (activeMultiCart && checkoutDetails) {
     return (
       <div className="flex w-full h-24 gap-3 px-6 py-3 cursor-pointer max-h-20 lg:px-5">
         <div className="w-[50%] hidden" onClick={() => setOpen(true)}>
@@ -60,12 +60,12 @@ const ShopifyCheckout = ({ priceDetails, setOpen }) => {
             <div className="flex flex-col gap-1 pr-4 ">
               <div className="text-lg font-semibold leading-none">
                 {globalState.currency}
-                {parseFloat(priceDetails.finalPrice)}
+                {checkoutDetails.total_price}
               </div>
               <div className="text-[10px] text-opacity-60 leading-none">
                 <del>
                   {globalState.currency}
-                  {parseFloat(priceDetails.totalCostPrice)}
+                  {checkoutDetails.total_line_items_price}
                 </del>
               </div>
             </div>

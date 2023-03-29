@@ -14,7 +14,9 @@ import { initEventApps } from "@/helper/EventTracker";
 import { getDataLayer, persistCart } from "@/helper/globalDataLayer";
 import { getCouponCode, isInViewport } from "@/helper/utilityHelper";
 import Head from "next/head";
+
 import { useRouter } from "next/router";
+
 import Script from "next/script";
 import React, { useContext, useEffect, useState , useLayoutEffect} from "react";
 

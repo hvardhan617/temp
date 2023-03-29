@@ -100,7 +100,7 @@ const BottomBar = ({ setOpenCart }) => {
           <div className="px-4">
             <p className="text-xs">Cart Summary</p>
             <p className="mt-2 text-xs font-semibold">
-              {calculateTotalItems(globalState.cartItems)} total
+              { globalState.multiProductCart.length > 0 ? calculateTotalItems(globalState.multiProductCart) : calculateTotalItems(globalState.cartItems)} total
             </p>
           </div>
           <div className={`${additionalSaving > 0 ? 'visible' : 'invisible'}`}>
