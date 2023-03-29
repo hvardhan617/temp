@@ -32,6 +32,7 @@ const ShopifyStoreCard = () => {
     finalPrice: 0,
     costPrice: 0,
     msg: "",
+    slashedPrice: 0,
   });
 
   useEffect(() => {
@@ -41,10 +42,12 @@ const ShopifyStoreCard = () => {
     console.log("checkout details", totalPrices, finalPrice, msg);
     setPriceDetails({
       finalPrice,
+      slashedPrice: totalPrices.totalCostPrice,
       msg,
       costPrice: totalPrices.totalCostPrice,
     });
   }, [globalState]);
+  
   if (checkoutDetails) {
     return (
       <div className="w-full border-y-[1px] border-zinc-100 flex flex-col justify-between gap-1 pb-4">
@@ -81,14 +84,14 @@ const ShopifyStoreCard = () => {
                 <p className="text-[14px] font-semibold text-red-500">
                   {calculatePercentage(
                     checkoutDetails.total_price,
-                    checkoutDetails.total_line_items_price
+                    priceDetails.slashedPrice
                   )}
                 </p>
                 {checkoutDetails.total_price !==
                   checkoutDetails.total_line_items_price && (
                   <del className="text-[14px] font-normal text-zinc-400 leading-3">
                     {globalState.currency}
-                    {checkoutDetails.total_line_items_price}
+                    {priceDetails.slashedPrice}
                   </del>
                 )}
               </div>
