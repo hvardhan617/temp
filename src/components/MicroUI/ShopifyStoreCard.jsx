@@ -87,10 +87,8 @@ const ShopifyStoreCard = () => {
                     priceDetails.slashedPrice
                   )}
                 </p>
-                {calculatePercentage(
-                  checkoutDetails.total_price,
-                  priceDetails.slashedPrice
-                ) !== 0 && (
+                {parseInt(checkoutDetails.total_price) !==
+                  priceDetails.slashedPrice && (
                   <del className="text-[14px] font-normal text-zinc-400 leading-3">
                     {globalState.currency}
                     {priceDetails.slashedPrice}

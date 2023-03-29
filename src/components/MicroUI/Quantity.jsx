@@ -223,6 +223,9 @@ const Quantity = () => {
         globalState.selectedVariant._id
       );
 
+      if (updatedCart.length === 0) {
+        updatedCart = globalState.cartItems;
+      }
       console.log("updatedCart", updatedCart, cartItems);
     }
 
