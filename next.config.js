@@ -40,10 +40,6 @@ const nextConfig = {
   reactStrictMode: true,
   distDir: '/a/fibr',
   assetPrefix: '/a/fibr',
-  env: {
-    NEXT_PUBLIC_API_HOST: process.env.NEXT_PUBLIC_API_HOST,
-    CACHE_HOST: process.env.CACHE_HOST,
-  },
 };
 
 module.exports = nextConfig;
