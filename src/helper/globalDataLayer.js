@@ -248,7 +248,7 @@ export const getDataLayer = (server) => {
   return {
     store: "Brand",
     multi: server.multi,
-    currency: getCurrency("USD"),
+    currency: getCurrency(server.brandData.currency),
     theme: { ...data.brand.theme },
     productAddedToCart: false,
     campaignData: server.campaignData,

@@ -134,7 +134,6 @@ const Quantity = () => {
       globalState.campaignData._id,
       cartArr,
       getCouponCode(globalState.campaignData)
-
     );
 
     if (checkoutDetails) {
@@ -184,9 +183,9 @@ const Quantity = () => {
   const decreaseQuantity = async () => {
     sendEvent("Click_Decrease_Quantity");
 
-    let cartItems = globalState.cartItems;
+    let cartItems;
 
-    if (globalState.multi) {
+    if (globalState.multiProductCart.length > 0) {
       cartItems = globalState.multiProductCart;
     }
 
@@ -195,34 +194,37 @@ const Quantity = () => {
       globalState.selectedVariant._id
     );
 
-    if (globalState.multi) {
-      let productAddedToCart = true;
-      if (updatedCart.length === 0) {
-        productAddedToCart = false;
+    if (updatedCart.length > 0) {
+      let checkoutDetails;
+
+      if (updatedCart.length > 0) {
+        let cartArr = updatedCart.map((item) => {
+          return {
+            variantId: item._id,
+            quantity: item.quantity,
+          };
+        });
+
+        checkoutDetails = await getCartDetails(
+          globalState.campaignData._id,
+          cartArr,
+          getCouponCode(globalState.campaignData)
+        );
+      } else {
       }
-
-      let cartArr = updatedCart.map((item) => {
-        return {
-          variantId: item._id,
-          quantity: item.quantity,
-        };
-      });
-
-      let checkoutDetails = await getCartDetails(
-        globalState.campaignData._id,
-        cartArr,
-        getCouponCode(globalState.campaignData)
-      );
 
       setGlobalState({
         ...globalState,
         checkoutDetails: checkoutDetails ? checkoutDetails.checkout : null,
         multiProductCart: updatedCart,
-        productAddedToCart,
       });
+
       persistCart(updatedCart);
 
       return;
+    } else {
+      updatedCart = globalState.cartItems;
+      console.log("updatedCart", updatedCart, cartItems);
     }
 
     let cartArr = [
@@ -236,18 +238,21 @@ const Quantity = () => {
       globalState.campaignData._id,
       cartArr,
       getCouponCode(globalState.campaignData)
-
     );
 
     if (checkoutDetails) {
       setGlobalState({
         ...globalState,
         cartItems: updatedCart,
+        productAddedToCart: false,
+        multiProductCart:[],
         checkoutDetails: checkoutDetails.checkout,
       });
     } else {
       setGlobalState({
         ...globalState,
+        multiProductCart:[],
+        productAddedToCart: false,
         cartItems: updatedCart,
       });
     }

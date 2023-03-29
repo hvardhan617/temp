@@ -51,9 +51,9 @@ const CheckoutCard = () => {
               />
               <div className="">
                 <p className="font-semibold">
-                  {globalState.brandData.registeredName}
+                  {globalState.brandData.brandName}
                 </p>
-                <p className="text-[9px] text-zinc-400">{store.url}</p>
+                <p className="text-[9px] text-zinc-400">{globalState.brandData.domain}</p>
               </div>
             </div>
             <div>

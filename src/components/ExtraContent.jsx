@@ -31,9 +31,9 @@ const ExtraContent = ({ featured }) => {
           {getAccordion("description", globalState.productDetails.description)}
         </Accordion>
 
-        <Accordion title="Customer Reviews" type={"reviews"}>
+        {globalState.productDetails.ratingSources.length > 0 && <Accordion title="Customer Reviews" type={"reviews"}>
           {getAccordion("reviews", "")}
-        </Accordion>
+        </Accordion>}
 
         {selectedVariant.amazonDetails &&
           selectedVariant.amazonDetails.bulletPoint.length > 0 && (

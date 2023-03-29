@@ -88,7 +88,7 @@ const ShopifyStoreCard = () => {
                   )}
                 </p>
                 {checkoutDetails.total_price !==
-                  checkoutDetails.total_line_items_price && (
+                  priceDetails.slashedPrice && (
                   <del className="text-[14px] font-normal text-zinc-400 leading-3">
                     {globalState.currency}
                     {priceDetails.slashedPrice}
