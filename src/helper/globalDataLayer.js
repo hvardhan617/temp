@@ -165,6 +165,9 @@ export const getDataLayer = (server) => {
   if (!server) {
     return;
   }
+
+  console.log("serverrData", server);
+
   if (server.multi) {
     data = {
       brand: {
@@ -228,26 +231,27 @@ export const getDataLayer = (server) => {
         // },
       },
       details: {
-        ...server.data,
-        options: cleanOptions(server.data.options),
+        ...server.productData,
+        options: cleanOptions(server.productData.options),
         variants: [
           {
             type: "Colour",
-            details: [...server.data.variants],
+            details: [...server.productData.variants],
           },
         ],
       },
-      selectedVariant: { ...server.data.variants[0] },
-      stores: server.data.stores,
+      selectedVariant: { ...server.productData.variants[0] },
+      stores: server.productData.stores,
     };
   }
 
   return {
     store: "Brand",
     multi: server.multi,
-    currency: getCurrency("USD"),
+    currency: getCurrency(server.brandData.currency),
     theme: { ...data.brand.theme },
     productAddedToCart: false,
+    campaignData: server.campaignData,
     cartItems: server.multi
       ? [
           {
@@ -271,7 +275,9 @@ export const getDataLayer = (server) => {
     selectedStore: "Shopify",
     stores: data.stores,
     storesData: { ...data.details.variants[0].details[0].storesPrices },
-    selectedVariant: { ...data.selectedVariant },
+    selectedVariant: server.multi
+      ? { ...data.selectedVariant }
+      : getDefaultVariant({ ...data.selectedVariant }),
     variants: { ...data.details.variants[0] },
     productDetails: data.details,
     brandData: server.brandData,
@@ -305,7 +311,8 @@ export const getProductDetails = (globalState, prod) => {
     selectedProduct: { ...prod, options: cleanOptions(prod.options) },
     storesData: { ...prod.variants[0].details[0].storesPrices },
     selectedVariant: { ...prod.variants[0].details[0] },
-    variants: { ...prod.variants[0] },
+    variants: { type: "Colour", details: prod.variants[0].details },
+    variantDetails: [{ type: "Colour", details: prod.variants[0].details }],
     productDetails: {
       ...prod,
       options: cleanOptions(prod.options),
@@ -358,4 +365,13 @@ export const getCart = () => {
   } catch (error) {
     return [];
   }
+};
+
+const getDefaultVariant = (variant) => {
+  const cart = getCart();
+  if (cart) {
+    return cart[0];
+  }
+
+  return variant;
 };

@@ -44,7 +44,6 @@ export const getTotalAmazon = (items) => {
   let totalSellingPrice = 0;
   let totalCostPrice = 0;
   let totalSavings = 0;
-  console.log('amazonPrices', items);
 
   items.forEach((item) => {
     let amazon = item.pricesFromStores.filter((store) => store.storeId === 'amazon.com')[0];
@@ -77,12 +76,12 @@ export const calculatePercentage = (sellingPrice, slashPrice) => {
 };
 
 export const calculateFinalCart = (store, prices) => {
-  let finalPrice = 0,
     // additionalSaving = 0,
-    percentageMsg = '';
+   let percentageMsg = '';
   // let totalSavings = 0;
 
-  finalPrice = prices.totalSellingPrice;
+  console.log('prices--->', prices);
+  let finalPrice = prices.totalSellingPrice;
   percentageMsg = calculatePercentage(finalPrice, prices.totalCostPrice);
 
   return {
