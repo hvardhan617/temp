@@ -9,9 +9,7 @@ const client = redis.createClient({
 client
     .connect()
     .then(async (res) => {
-        console.log(res);
-        console.log(client);
-        console.log("::::Connected to Redis::::" + JSON.stringify(client));
+        console.log("::::Connected to Redis::::");
     })
     .catch((err) => {
         console.log('err happened' + err);
