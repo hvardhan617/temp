@@ -182,7 +182,10 @@ export async function getServerSideProps({ query }) {
   }
   // Store the fetched page in Redis cache
   console.log("::::Setting page data into redis:::::")
-  await redis.set(`page:${query}`, JSON.stringify(data), 'EX', 60 * 5); // set expiry time to 5 minutes
+  await redis.set(`page:${query}`, JSON.stringify(data), {
+    EX: 900,
+    NX: true
+  }); // set expiry time to 15 minutes
 
   let stringifyP = JSON.stringify(productData);
   let stringifyC = JSON.stringify(campaignData);
